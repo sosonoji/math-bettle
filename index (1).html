@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathBattle 1v1 - สนามแข่งคณิตศาสตร์</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;900&family=Kanit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ===== STARS BACKGROUND ===== -->
+<div class="stars-bg" id="starsBg"></div>
+
+<!-- ===========================
+     SCREEN: HOME
+=========================== -->
+<div class="screen active" id="screen-home">
+  <div class="home-logo">
+    <h1>⚔️ MATH BATTLE</h1>
+    <p>สนามแข่งคณิตศาสตร์ 1v1</p>
+  </div>
+  <div class="menu-box">
+
+    <!-- Player Name Input -->
+    <div class="name-section">
+      <label>ชื่อผู้เล่นของคุณ</label>
+      <input type="text" class="input-field" id="myNameInput"
+             placeholder="ใส่ชื่อของคุณ..." maxlength="20">
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('online',event)">🌐 ออนไลน์</button>
+      <button class="tab"        onclick="switchTab('bot',event)">🤖 VS บอท</button>
+      <button class="tab"        onclick="switchTab('leaderboard',event)">🏆 ลีดเดอร์</button>
+    </div>
+
+    <!-- Tab: Online -->
+    <div id="tab-online">
+      <div class="menu-title">ค้นหาผู้เล่น</div>
+      <div class="friend-search">
+        <input type="text" class="input-field" id="searchInput"
+               placeholder="พิมพ์ชื่อเพื่อน..."
+               oninput="searchFriend(this.value)">
+        <button class="btn btn-primary" style="width:auto;padding:10px 16px"
+                onclick="searchFriend(document.getElementById('searchInput').value)">ค้นหา</button>
+      </div>
+      <div id="searchResults"></div>
+      <div class="divider"></div>
+      <div class="menu-title">ผู้เล่นออนไลน์</div>
+      <div id="onlinePlayers"></div>
+    </div>
+
+    <!-- Tab: Bot -->
+    <div id="tab-bot" style="display:none">
+      <div class="menu-title">เลือกความยากของบอท</div>
+      <div class="level-list" id="botLevelList">
+        <div class="level-btn" onclick="selectBotLevel('easy',this)">
+          <span class="level-icon">😊</span>
+          <div class="level-info">
+            <div class="name">ง่าย</div>
+            <div class="desc">บอทตอบช้า ผิดบ้าง (35%)</div>
+          </div>
+        </div>
+        <div class="level-btn" onclick="selectBotLevel('medium',this)">
+          <span class="level-icon">😐</span>
+          <div class="level-info">
+            <div class="name">ปานกลาง</div>
+            <div class="desc">บอทตอบปานกลาง ผิด 15%</div>
+          </div>
+        </div>
+        <div class="level-btn" onclick="selectBotLevel('hard',this)">
+          <span class="level-icon">😈</span>
+          <div class="level-info">
+            <div class="name">ยาก</div>
+            <div class="desc">บอทตอบเร็วมาก แทบไม่ผิด (3%)</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="botStartBtn"
+              onclick="startVsBot()" style="opacity:.5" disabled>
+        เริ่มเกมกับบอท ▶
+      </button>
+    </div>
+
+    <!-- Tab: Leaderboard -->
+    <div id="tab-leaderboard" style="display:none">
+      <div class="menu-title">🏆 Top 10 ผู้เล่น</div>
+      <div id="leaderboardList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===========================
+     SCREEN: TOPIC SELECT
+=========================== -->
+<div class="screen" id="screen-topic">
+  <div class="setup-container">
+    <button class="back-btn" onclick="goBack('screen-home')">← กลับ</button>
+    <div class="section-title">📚 เลือกหัวข้อ</div>
+    <div class="topic-grid">
+      <div class="topic-btn" onclick="selectTopic('add',this)">
+        <div class="icon">➕</div><div class="name">การบวก</div>
+      </div>
+      <div class="topic-btn" onclick="selectTopic('sub',this)">
+        <div class="icon">➖</div><div class="name">การลบ</div>
+      </div>
+      <div class="topic-btn" onclick="selectTopic('mul',this)">
+        <div class="icon">✖️</div><div class="name">การคูณ</div>
+      </div>
+      <div class="topic-btn" onclick="selectTopic('div',this)">
+        <div class="icon">➗</div><div class="name">การหาร</div>
+      </div>
+      <div class="topic-btn" onclick="selectTopic('mixed',this)">
+        <div class="icon">🔀</div><div class="name">รวมทุกอย่าง</div>
+      </div>
+      <div class="topic-btn" onclick="selectTopic('frac',this)">
+        <div class="icon">🔢</div><div class="name">เศษส่วน</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="topicNextBtn"
+            style="opacity:.5" disabled onclick="goToLevel()">ถัดไป ›</button>
+  </div>
+</div>
+
+<!-- ===========================
+     SCREEN: LEVEL SELECT
+=========================== -->
+<div class="screen" id="screen-level">
+  <div class="setup-container">
+    <button class="back-btn" onclick="goBack('screen-topic')">← กลับ</button>
+    <div class="section-title">⚡ เลือกระดับความยาก</div>
+    <div class="level-list" id="diffLevelList">
+      <div class="level-btn" onclick="selectLevel('easy',this)">
+        <span class="level-icon">🌱</span>
+        <div class="level-info">
+          <div class="name">ง่าย</div>
+          <div class="desc">ตัวเลข 1–10 เหมาะสำหรับมือใหม่</div>
+        </div>
+      </div>
+      <div class="level-btn" onclick="selectLevel('medium',this)">
+        <span class="level-icon">🔥</span>
+        <div class="level-info">
+          <div class="name">ปานกลาง</div>
+          <div class="desc">ตัวเลข 2 หลัก ท้าทายขึ้น</div>
+        </div>
+      </div>
+      <div class="level-btn" onclick="selectLevel('hard',this)">
+        <span class="level-icon">💀</span>
+        <div class="level-info">
+          <div class="name">ยาก</div>
+          <div class="desc">ตัวเลข 3 หลัก ต้องใช้ทักษะ</div>
+        </div>
+      </div>
+      <div class="level-btn" onclick="selectLevel('extreme',this)">
+        <span class="level-icon">☠️</span>
+        <div class="level-info">
+          <div class="name">ยากมาก</div>
+          <div class="desc">ตัวเลขขนาดใหญ่ สุดยอดเท่านั้น</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="levelNextBtn"
+            style="opacity:.5" disabled onclick="startGame()">เริ่มเกม! ⚔️</button>
+  </div>
+</div>
+
+<!-- ===========================
+     MODAL: ABILITY PICK
+=========================== -->
+<div class="modal-overlay" id="abilityPickModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title">🃏 เลือกการ์ดความสามารถ</div>
+    <div class="modal-sub" id="abilityPickSub">เลือก 1 ใบจาก 3 ใบที่สุ่มมา</div>
+    <div class="ability-pick-grid" id="abilityPickGrid"></div>
+    <button class="btn btn-purple" id="abilityPickConfirm"
+            onclick="confirmAbilityPick()" style="opacity:.5" disabled>ยืนยันเลือก</button>
+  </div>
+</div>
+
+<!-- ===========================
+     MODAL: SWAP CONFIRM
+=========================== -->
+<div class="modal-overlay" id="swapModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title">🔄 สลับโจทย์?</div>
+    <div class="modal-sub">คุณต้องการสลับโจทย์กับฝ่ายตรงข้ามหรือไม่?</div>
+    <div class="flex-gap mt-16">
+      <button class="btn btn-red"       onclick="confirmSwap(true)">สลับ ✅</button>
+      <button class="btn btn-secondary" onclick="confirmSwap(false)">ไม่สลับ ❌</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===========================
+     SCREEN: GAME
+=========================== -->
+<div class="screen" id="screen-game">
+  <div class="game-layout">
+
+    <!-- Header bar -->
+    <div class="game-header">
+      <div class="player-header">
+        <div>
+          <div class="player-name-tag" id="p1Name">P1</div>
+          <div class="hearts" id="p1Hearts"></div>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div class="vs-tag">VS</div>
+        <div class="round-display" id="roundDisplay">รอบที่ 1</div>
+      </div>
+      <div class="player-header" style="flex-direction:row-reverse">
+        <div style="text-align:right">
+          <div class="player-name-tag" id="p2Name">P2</div>
+          <div class="hearts" style="justify-content:flex-end" id="p2Hearts"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status message area -->
+    <div id="statusMsgArea" style="padding:0 16px"></div>
+
+    <!-- Main board -->
+    <div class="board-section">
+      <div class="round-info">
+        <div class="round-badge" id="phaseBadge">เลือกการ์ดโจทย์</div>
+        <div class="phase-desc"  id="phaseDesc">แต่ละฝ่ายเลือก 1 ใบจากมือ</div>
+      </div>
+
+      <!-- Question display -->
+      <div class="question-display">
+        <div class="question-card" id="questionCard">
+          <div class="question-text" id="questionText">
+            <span class="question-hidden">? ? ?</span>
+          </div>
+        </div>
+        <div id="botThinkArea" style="display:none">
+          <div class="bot-thinking">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <span>บอทกำลังคิด...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Answer inputs -->
+      <div id="answerSection" style="display:none">
+        <div class="answer-section">
+          <div style="text-align:center">
+            <div class="ans-label" id="p1AnsLabel">P1</div>
+            <input type="number" class="answer-input" id="p1Answer"
+                   placeholder="?"
+                   onkeydown="if(event.key==='Enter')submitAnswer(1)">
+            <button class="btn-submit" id="p1SubmitBtn" onclick="submitAnswer(1)">ยืนยัน</button>
+          </div>
+          <div class="vs-divider">—</div>
+          <div style="text-align:center">
+            <div class="ans-label" id="p2AnsLabel">P2</div>
+            <input type="number" class="answer-input" id="p2Answer"
+                   placeholder="?"
+                   onkeydown="if(event.key==='Enter')submitAnswer(2)">
+            <button class="btn-submit" id="p2SubmitBtn" onclick="submitAnswer(2)">ยืนยัน</button>
+          </div>
+        </div>
+        <!-- Multiple choice (hint card) -->
+        <div id="multiChoiceWrap" style="display:none;margin-top:12px">
+          <div class="choices-grid" id="choicesGrid"></div>
+        </div>
+      </div>
+    </div><!-- /board-section -->
+
+    <!-- P1 Hand -->
+    <div class="hand-section hand-p1" id="p1HandSection">
+      <div class="hand-header">
+        <div class="cards-label">🃏 <span id="p1HandLabel">P1</span> — การ์ดโจทย์</div>
+        <div class="hand-hint">เลือก 1 ใบ</div>
+      </div>
+      <div class="hand-cards" id="p1HandCards"></div>
+    </div>
+
+    <!-- P2 Hand -->
+    <div class="hand-section hand-p2" id="p2HandSection">
+      <div class="hand-header">
+        <div class="cards-label">🃏 <span id="p2HandLabel">P2</span> — การ์ดโจทย์</div>
+        <div class="hand-hint">เลือก 1 ใบ</div>
+      </div>
+      <div class="hand-cards" id="p2HandCards"></div>
+    </div>
+
+    <!-- Confirm selection -->
+    <div id="cardSelectActions" style="display:none" class="confirm-bar">
+      <button class="btn btn-green" onclick="confirmCardSelection()">
+        ✅ ยืนยันการ์ดที่เลือก
+      </button>
+    </div>
+
+    <!-- Ability Cards -->
+    <div class="cards-section">
+      <div class="ability-row">
+        <div>
+          <div class="cards-label">🌟 <span id="p1AbilLabel">P1</span> การ์ดพิเศษ</div>
+          <div class="cards-row" id="p1AbilityCards"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="cards-label">🌟 <span id="p2AbilLabel">P2</span> การ์ดพิเศษ</div>
+          <div class="cards-row" id="p2AbilityCards" style="justify-content:flex-end"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /game-layout -->
+</div>
+
+<!-- ===========================
+     OVERLAY: ROUND RESULT
+=========================== -->
+<div class="round-result-overlay" id="roundResultOverlay" style="display:none">
+  <div class="round-result-box">
+    <div class="result-icon" id="resultIcon">🏆</div>
+    <div class="result-title" id="resultTitle">ชนะ!</div>
+    <div class="result-sub"   id="resultSub">ตอบถูกเร็วกว่า</div>
+    <div id="resultDetails"   class="result-details"></div>
+    <button class="btn btn-primary mt-16" onclick="nextRound()">ถัดไป ▶</button>
+  </div>
+</div>
+
+<!-- ===========================
+     SCREEN: GAME OVER
+=========================== -->
+<div class="screen" id="screen-gameover">
+  <div class="game-over-screen">
+    <div class="game-over-icon" id="goIcon">🏆</div>
+    <div class="game-over-title" id="goTitle">ชนะ!</div>
+    <div class="stars-display"  id="goStars">⭐</div>
+    <div class="go-desc"        id="goDesc"></div>
+    <div class="go-stats"       id="goStats"></div>
+    <div class="flex-gap mt-16">
+      <button class="btn btn-primary"   onclick="playAgain()">เล่นอีกครั้ง ↺</button>
+      <button class="btn btn-secondary" onclick="goHome()">หน้าหลัก 🏠</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="js/questions.js"></script>
+<script src="js/abilities.js"></script>
+<script src="js/bot.js"></script>
+<script src="js/leaderboard.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
