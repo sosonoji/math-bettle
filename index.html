@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚔️ MathBattle 1v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;900&family=Kanit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0e1a;--bg2:#111827;--bg3:#1a2234;--card:#161d2e;
+  --border:#2d3748;--text:#f1f5f9;--text2:#94a3b8;
+  --accent:#f59e0b;--acdk:#d97706;--red:#ef4444;
+  --green:#10b981;--blue:#3b82f6;--purple:#8b5cf6;--gold:#fbbf24;
+  --shadow:0 4px 24px rgba(0,0,0,.5);
+  --r8:8px;--r12:12px;--r16:16px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:14px;line-height:1.5}
+h1,h2,h3{font-family:'Kanit',sans-serif}
+.stars-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle var(--d,3s) infinite}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.8}}
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center}
+.screen.active{display:flex}
+#screen-login{justify-content:center;padding:20px;background:linear-gradient(135deg,#0a0e1a,#0f1729,#0a0e1a)}
+.login-wrap{width:100%;max-width:400px;position:relative;z-index:1}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo h1{font-size:clamp(28px,6vw,48px);background:linear-gradient(135deg,#f59e0b,#ef4444,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:6px}
+.login-logo p{color:var(--text2);font-size:12px;letter-spacing:2px;text-transform:uppercase}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r16);padding:24px;box-shadow:var(--shadow)}
+.login-tabs{display:flex;gap:6px;margin-bottom:20px}
+.login-tab{flex:1;padding:9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r8);cursor:pointer;text-align:center;font-size:13px;color:var(--text2);font-family:'Prompt',sans-serif;transition:all .2s}
+.login-tab.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+.login-field{margin-bottom:14px}
+.login-field label{display:block;font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.login-err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);border-radius:var(--r8);padding:10px 13px;font-size:13px;margin-bottom:14px;display:none}
+.login-ok{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);border-radius:var(--r8);padding:10px 13px;font-size:13px;margin-bottom:14px;display:none}
+.profile-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.logout-btn{background:none;border:1px solid var(--border);border-radius:var(--r8);color:var(--text2);font-size:11px;padding:5px 10px;cursor:pointer;font-family:'Prompt',sans-serif;transition:all .2s;white-space:nowrap}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+#screen-home{justify-content:center;padding:20px;background:linear-gradient(135deg,#0a0e1a,#0f1729,#0a0e1a)}
+.home-logo{text-align:center;margin-bottom:28px;position:relative;z-index:1}
+.home-logo h1{font-size:clamp(32px,6vw,56px);background:linear-gradient(135deg,#f59e0b,#ef4444,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:8px}
+.home-logo p{color:var(--text2);font-size:13px;letter-spacing:2px;text-transform:uppercase}
+.menu-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r16);padding:22px;width:100%;max-width:420px;position:relative;z-index:1;box-shadow:var(--shadow)}
+.home-profile{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:10px 14px;margin-bottom:16px}
+.home-profile .profile-avatar{width:34px;height:34px;font-size:16px}
+.profile-info{flex:1;min-width:0}
+.profile-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.profile-stars{font-size:12px;color:var(--gold)}
+.name-sec{margin-bottom:18px}
+.name-sec label{display:block;font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r8);padding:11px 13px;color:var(--text);font-family:'Prompt',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.inp:focus{border-color:var(--accent)}
+.inp::placeholder{color:var(--text2)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:var(--r12);border:none;font-family:'Prompt',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--acdk));color:#000}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,158,11,.4)}
+.btn-s{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.btn-s:hover{background:var(--border);color:var(--text)}
+.btn-b{background:linear-gradient(135deg,var(--blue),#2563eb);color:#fff}
+.btn-b:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(59,130,246,.4)}
+.btn-g{background:linear-gradient(135deg,var(--green),#059669);color:#fff}
+.btn-g:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,.4)}
+.btn-r{background:linear-gradient(135deg,var(--red),#dc2626);color:#fff}
+.btn-r:hover{transform:translateY(-2px)}
+.btn-pu{background:linear-gradient(135deg,var(--purple),#7c3aed);color:#fff}
+.btn-pu:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(139,92,246,.4)}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;padding:9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r8);cursor:pointer;text-align:center;font-size:13px;color:var(--text2);font-family:'Prompt',sans-serif;transition:all .2s;position:relative}
+.tab.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+.tab .badge-req{position:absolute;top:-6px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:10px;padding:1px 5px;min-width:16px}
+.mtitle{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.div{height:1px;background:var(--border);margin:14px 0}
+.flex-gap{display:flex;gap:10px}
+.mt16{margin-top:16px}
+.tc{text-align:center}
+.tmuted{color:var(--text2)}
+.fsearch{display:flex;gap:8px;margin-bottom:10px}
+.fsearch input{flex:1}
+.fi{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg3);border-radius:var(--r8);margin-bottom:6px;border:1px solid var(--border);gap:8px}
+.fi .fn{font-weight:600;font-size:13px}
+.fi .fstars{font-size:11px;color:var(--gold);margin-top:2px}
+.dot-on{width:8px;height:8px;background:var(--green);border-radius:50%;margin-right:6px;display:inline-block;box-shadow:0 0 6px var(--green)}
+.dot-off{width:8px;height:8px;background:#4b5563;border-radius:50%;margin-right:6px;display:inline-block}
+.reqbox{background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.35);border-radius:var(--r12);padding:10px;margin-bottom:14px}
+.smallbtn{width:auto;padding:6px 12px;font-size:11px;flex-shrink:0}
+.setup{width:100%;max-width:480px;position:relative;z-index:1;padding:20px}
+.stitle{font-size:20px;font-weight:700;margin-bottom:20px;text-align:center;font-family:'Kanit',sans-serif}
+.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--text2);cursor:pointer;font-family:'Prompt',sans-serif;font-size:13px;padding:8px 0;margin-bottom:14px}
+.back-btn:hover{color:var(--text)}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.tbtn{padding:20px 12px;border-radius:var(--r12);border:2px solid var(--border);background:var(--card);cursor:pointer;text-align:center;transition:all .2s;color:var(--text)}
+.tbtn:hover,.tbtn.sel{border-color:var(--accent)}
+.tbtn.sel{background:rgba(245,158,11,.1)}
+.tbtn .ti{font-size:28px;margin-bottom:6px}
+.tbtn .tn{font-weight:700;font-size:13px}
+.llist{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.lbtn{padding:15px 18px;border-radius:var(--r12);border:2px solid var(--border);background:var(--card);cursor:pointer;display:flex;align-items:center;gap:13px;transition:all .2s;color:var(--text)}
+.lbtn:hover,.lbtn.sel{border-color:var(--accent);transform:translateX(4px)}
+.lbtn.sel{background:rgba(245,158,11,.1)}
+.lbtn .li{font-size:24px}
+.lbtn .ln{font-weight:700;font-size:14px}
+.lbtn .ld{font-size:11px;color:var(--text2);margin-top:2px}
+.lbi{display:flex;align-items:center;gap:12px;padding:11px;background:var(--bg3);border-radius:var(--r8);margin-bottom:8px;border:1px solid var(--border)}
+.lbr{font-size:17px;font-weight:900;width:30px;text-align:center;color:var(--text2)}
+.lbr.gold{color:#fbbf24}.lbr.silver{color:#94a3b8}.lbr.bronze{color:#92400e}
+.lbn{flex:1;font-weight:600}
+.lbs{color:var(--gold);font-size:13px}
+.mover{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
+.mbox{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;max-width:400px;width:90%;animation:popIn .3s ease;max-height:90vh;overflow-y:auto}
+.mtit{font-size:18px;font-weight:700;margin-bottom:4px;text-align:center}
+.msub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:18px}
+.apgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.apc{border:2px solid var(--border);border-radius:var(--r12);background:var(--bg3);padding:13px 8px;cursor:pointer;text-align:center;transition:all .2s}
+.apc:hover{border-color:var(--purple);transform:translateY(-4px)}
+.apc.sel{border-color:var(--purple);background:rgba(139,92,246,.12)}
+.apc .api{font-size:26px;margin-bottom:7px}
+.apc .apn{font-size:11px;font-weight:700;margin-bottom:4px}
+.apc .apd{font-size:10px;color:var(--text2);line-height:1.4}
+.glayout{display:flex;flex-direction:column;width:100%;min-height:100vh}
+.ghdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.phdr{display:flex;align-items:center;gap:10px}
+.pntag{font-weight:700;font-size:13px;margin-bottom:3px}
+.rdis{font-size:11px;color:var(--text2);margin-top:2px}
+.hearts{display:flex;gap:3px}
+.heart{font-size:17px;transition:all .3s}
+.heart.empty{opacity:.2;filter:grayscale(1)}
+.vstag{background:var(--red);color:#fff;padding:4px 12px;border-radius:20px;font-weight:900;font-size:13px}
+.bsec{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;min-height:280px}
+.rinfo{text-align:center;margin-bottom:14px}
+.rbadge{background:var(--accent);color:#000;padding:4px 16px;border-radius:20px;font-size:12px;font-weight:700;display:inline-block;margin-bottom:5px}
+.pdesc{font-size:12px;color:var(--text2)}
+.qdis{text-align:center;margin-bottom:18px}
+.qcard{background:var(--card);border:2px solid var(--border);border-radius:var(--r16);padding:20px 28px;min-width:260px;text-align:center;position:relative;overflow:hidden;transition:border-color .3s}
+.qcard.rev{border-color:var(--accent);background:rgba(245,158,11,.05)}
+.qtxt{font-size:clamp(24px,5vw,40px);font-weight:900;font-family:'Kanit',sans-serif;letter-spacing:2px;min-height:52px;display:flex;align-items:center;justify-content:center}
+.qhid{font-size:38px;color:var(--text2);letter-spacing:8px}
+.blurn{filter:blur(6px);user-select:none}
+.ansec{display:flex;gap:20px;justify-content:center;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap}
+.albl{font-size:11px;color:var(--text2);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.ainp{width:140px;background:var(--bg3);border:2px solid var(--border);border-radius:var(--r8);padding:11px 12px;color:var(--text);font-family:'Prompt',sans-serif;font-size:22px;font-weight:700;text-align:center;outline:none;transition:all .2s;display:block;margin-bottom:7px}
+.ainp:focus{border-color:var(--accent)}
+.ainp:disabled{opacity:.4}
+.vsdiv{font-size:24px;color:var(--text2);padding-top:28px}
+.asbtn{width:140px;padding:10px;background:linear-gradient(135deg,var(--green),#059669);border:none;border-radius:var(--r8);color:#fff;font-family:'Prompt',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:block}
+.asbtn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(16,185,129,.4)}
+.asbtn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.chgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:340px;margin:0 auto}
+.chbtn{padding:13px;border-radius:var(--r8);border:2px solid var(--border);background:var(--bg3);cursor:pointer;font-family:'Prompt',sans-serif;font-size:16px;font-weight:700;color:var(--text);transition:all .2s}
+.chbtn:hover{border-color:var(--accent);background:rgba(245,158,11,.1)}
+.chbtn.cor{border-color:var(--green);background:rgba(16,185,129,.15);color:var(--green)}
+.chbtn.wrg{border-color:var(--red);background:rgba(239,68,68,.15);color:var(--red)}
+.chbtn:disabled{cursor:default}
+.hsec{padding:11px 14px;border-top:1px solid var(--border)}
+.hp1{background:var(--bg2)}
+.hhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.clbl{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
+.hhint{font-size:11px;color:var(--accent)}
+.hcards{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.hcard{width:66px;height:88px;border-radius:var(--r8);border:2px solid var(--border);background:var(--card);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.hcard:hover{transform:translateY(-8px);border-color:var(--accent)}
+.hcard.sel{border-color:var(--accent);transform:translateY(-8px);box-shadow:0 8px 20px rgba(245,158,11,.4)}
+.hcard.used{opacity:.25;pointer-events:none}
+.hcard.static{cursor:default}
+.hcard.static:hover{transform:none;border-color:var(--border)}
+.cnum{font-size:11px;font-weight:700;color:var(--accent);margin-top:4px}
+.confbar{padding:12px 16px;background:var(--bg2);border-top:1px solid var(--border);text-align:center}
+.confbar .btn{max-width:300px;margin:0 auto}
+.csec{padding:11px 14px;background:var(--bg2);border-top:1px solid var(--border)}
+.abrow{display:flex;justify-content:space-between}
+.crow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.abcard{width:70px;min-height:88px;border-radius:var(--r8);border:2px solid var(--border);background:var(--card);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;gap:4px;transition:all .2s;text-align:center;flex-shrink:0}
+.abcard:hover{transform:translateY(-6px);border-color:var(--purple)}
+.abcard.used{opacity:.2;pointer-events:none;filter:grayscale(1)}
+.abcard.static{cursor:default}
+.abcard.static:hover{transform:none;border-color:var(--border)}
+.abcard .ai{font-size:22px}
+.abcard .an{font-size:9px;color:var(--text2);line-height:1.2;font-weight:600}
+.botthink{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);margin:8px 0;justify-content:center}
+.d{width:6px;height:6px;background:var(--text2);border-radius:50%;animation:db .8s ease infinite}
+.d:nth-child(2){animation-delay:.15s}
+.d:nth-child(3){animation-delay:.3s}
+@keyframes db{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.smsg{padding:8px 14px;border-radius:var(--r8);font-size:13px;font-weight:600;margin:6px 0;animation:fs .3s ease}
+.sw{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.sl{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.si{background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3)}
+.sa{background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.3)}
+@keyframes fs{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.rrover{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
+.rrbox{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:28px;text-align:center;max-width:320px;width:90%;animation:popIn .3s ease}
+.rico{font-size:52px;margin-bottom:10px}
+.rtit{font-size:26px;font-weight:900;font-family:'Kanit',sans-serif;margin-bottom:6px}
+.rsub{color:var(--text2);font-size:13px;margin-bottom:10px}
+.rdet{font-size:13px;color:var(--text2);margin:8px 0}
+#screen-gameover{justify-content:center;padding:20px}
+.goscreen{text-align:center;padding:24px;position:relative;z-index:1;width:100%;max-width:400px}
+.goico{font-size:60px;margin-bottom:14px;animation:bounce 1s ease infinite}
+.gotit{font-size:36px;font-weight:900;font-family:'Kanit',sans-serif;margin-bottom:6px}
+.gost{font-size:26px;margin:12px 0;letter-spacing:4px}
+.godesc{color:var(--text2);font-size:14px;margin-bottom:18px}
+.gostats{background:var(--card);border-radius:var(--r12);padding:16px;margin-bottom:18px;text-align:left;border:1px solid var(--border)}
+.fzmsg{text-align:center;padding:7px;color:var(--blue);font-weight:700;font-size:14px;margin:4px 0}
+#screen-waiting{justify-content:center;padding:20px;background:linear-gradient(135deg,#0a0e1a,#0f1729,#0a0e1a)}
+.waitbox{text-align:center;position:relative;z-index:1;max-width:360px}
+.spinner{width:54px;height:54px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 20px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.waittit{font-size:20px;font-weight:700;margin-bottom:8px}
+.waitsub{color:var(--text2);font-size:13px;margin-bottom:24px}
+.opp-wait-badge{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2);margin-top:6px}
+@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+@media(max-width:480px){
+  .ansec{gap:12px}
+  .ainp{width:120px;font-size:18px}
+  .asbtn{width:120px}
+  .abcard{width:60px}
+  .hcard{width:58px;height:76px}
+}
+</style>
+</head>
+<body>
+
+<div class="stars-bg" id="starsBg"></div>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div class="screen active" id="screen-login">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <h1>⚔️ MATH BATTLE</h1>
+      <p>สนามแข่งคณิตศาสตร์ 1v1</p>
+    </div>
+    <div class="login-card">
+      <div id="loginErrMsg" class="login-err"></div>
+      <div id="loginOkMsg" class="login-ok"></div>
+      <div class="login-tabs">
+        <button class="login-tab active" onclick="switchLoginTab('login',this)">🔑 เข้าสู่ระบบ</button>
+        <button class="login-tab" onclick="switchLoginTab('register',this)">✨ สมัครสมาชิก</button>
+      </div>
+      <div id="loginForm">
+        <div class="login-field">
+          <label>ชื่อผู้เล่น</label>
+          <input type="text" class="inp" id="loginName" placeholder="ใส่ชื่อของคุณ..." maxlength="20" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div class="login-field">
+          <label>รหัสผ่าน</label>
+          <input type="password" class="inp" id="loginPass" placeholder="รหัสผ่าน..." maxlength="30" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <button class="btn btn-p" onclick="doLogin()">เข้าสู่ระบบ ▶</button>
+        <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--text2)">ยังไม่มีบัญชี? <span style="color:var(--accent);cursor:pointer" onclick="switchLoginTab('register',null)">สมัครเลย</span></div>
+      </div>
+      <div id="registerForm" style="display:none">
+        <div class="login-field">
+          <label>ชื่อผู้เล่น (แสดงในเกม)</label>
+          <input type="text" class="inp" id="regName" placeholder="ชื่อที่อยากใช้..." maxlength="20" onkeydown="if(event.key==='Enter')doRegister()">
+        </div>
+        <div class="login-field">
+          <label>รหัสผ่าน</label>
+          <input type="password" class="inp" id="regPass" placeholder="ตั้งรหัสผ่าน..." maxlength="30" onkeydown="if(event.key==='Enter')doRegister()">
+        </div>
+        <div class="login-field">
+          <label>ยืนยันรหัสผ่าน</label>
+          <input type="password" class="inp" id="regPass2" placeholder="พิมพ์รหัสผ่านอีกครั้ง..." maxlength="30" onkeydown="if(event.key==='Enter')doRegister()">
+        </div>
+        <button class="btn btn-g" onclick="doRegister()">สมัครสมาชิก ✨</button>
+        <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--text2)">มีบัญชีแล้ว? <span style="color:var(--accent);cursor:pointer" onclick="switchLoginTab('login',null)">เข้าสู่ระบบ</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HOME ===== -->
+<div class="screen" id="screen-home">
+  <div class="home-logo">
+    <h1>⚔️ MATH BATTLE</h1>
+    <p>สนามแข่งคณิตศาสตร์ 1v1</p>
+  </div>
+  <div class="menu-box">
+    <div class="home-profile" id="homeProfile">
+      <div class="profile-avatar" id="homeAvatar">?</div>
+      <div class="profile-info">
+        <div class="profile-name" id="homeProfileName">ผู้เล่น</div>
+        <div class="profile-stars" id="homeProfileStars">⭐ 0 ดาว</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">ออกจากระบบ</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('online',event)">🌐 เพื่อน<span class="badge-req" id="reqBadge" style="display:none">0</span></button>
+      <button class="tab" onclick="switchTab('bot',event)">🤖 VS บอท</button>
+      <button class="tab" onclick="switchTab('lb',event)">🏆 ลีดเดอร์</button>
+    </div>
+    <div id="tab-online">
+      <div id="reqBox" style="display:none"></div>
+      <div class="mtitle">👥 เพื่อนของฉัน</div>
+      <div id="friendsList"><div class="tmuted tc" style="padding:10px">กำลังโหลด...</div></div>
+      <div class="div"></div>
+      <div class="mtitle">🔍 ค้นหา / เพิ่มเพื่อน</div>
+      <div class="fsearch">
+        <input type="text" class="inp" id="searchInput" placeholder="พิมพ์ชื่อผู้เล่น..." oninput="searchFriend(this.value)">
+      </div>
+      <div id="searchResults"></div>
+    </div>
+    <div id="tab-bot" style="display:none">
+      <div class="mtitle">เลือกความยากของบอท</div>
+      <div class="llist" id="botLevelList">
+        <div class="lbtn" onclick="selBotLv('easy',this)"><span class="li">😊</span><div><div class="ln">ง่าย</div><div class="ld">บอทตอบช้า ผิดบ้าง 35%</div></div></div>
+        <div class="lbtn" onclick="selBotLv('medium',this)"><span class="li">😐</span><div><div class="ln">ปานกลาง</div><div class="ld">บอทตอบปานกลาง ผิด 15%</div></div></div>
+        <div class="lbtn" onclick="selBotLv('hard',this)"><span class="li">😈</span><div><div class="ln">ยาก</div><div class="ld">บอทตอบเร็วมาก แทบไม่ผิด 3%</div></div></div>
+      </div>
+      <button class="btn btn-p" id="botStartBtn" onclick="startVsBot()" style="opacity:.5" disabled>เริ่มเกมกับบอท ▶</button>
+    </div>
+    <div id="tab-lb" style="display:none">
+      <div class="mtitle">🏆 Top 10 ผู้เล่น</div>
+      <div id="lbList"><div class="tmuted tc" style="padding:10px">กำลังโหลด...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOPIC ===== -->
+<div class="screen" id="screen-topic">
+  <div class="setup">
+    <button class="back-btn" onclick="cancelSetup()">← กลับ</button>
+    <div class="stitle">📚 เลือกหัวข้อ</div>
+    <div class="tgrid">
+      <div class="tbtn" onclick="selTopic('add',this)"><div class="ti">➕</div><div class="tn">การบวก</div></div>
+      <div class="tbtn" onclick="selTopic('sub',this)"><div class="ti">➖</div><div class="tn">การลบ</div></div>
+      <div class="tbtn" onclick="selTopic('mul',this)"><div class="ti">✖️</div><div class="tn">การคูณ</div></div>
+      <div class="tbtn" onclick="selTopic('div',this)"><div class="ti">➗</div><div class="tn">การหาร</div></div>
+      <div class="tbtn" onclick="selTopic('mixed',this)"><div class="ti">🔀</div><div class="tn">รวมทุกอย่าง</div></div>
+      <div class="tbtn" onclick="selTopic('frac',this)"><div class="ti">🔢</div><div class="tn">เศษส่วน</div></div>
+    </div>
+    <button class="btn btn-p" id="topicNextBtn" style="opacity:.5" disabled onclick="afterTopicPicked()">ถัดไป ›</button>
+  </div>
+</div>
+
+<!-- ===== LEVEL (bot mode only) ===== -->
+<div class="screen" id="screen-level">
+  <div class="setup">
+    <button class="back-btn" onclick="showScreen('screen-topic')">← กลับ</button>
+    <div class="stitle">⚡ เลือกระดับความยาก</div>
+    <div class="llist" id="diffLvList">
+      <div class="lbtn" onclick="selLevel('easy',this)"><span class="li">🌱</span><div><div class="ln">ง่าย</div><div class="ld">ตัวเลข 1–10</div></div></div>
+      <div class="lbtn" onclick="selLevel('medium',this)"><span class="li">🔥</span><div><div class="ln">ปานกลาง</div><div class="ld">ตัวเลข 2 หลัก</div></div></div>
+      <div class="lbtn" onclick="selLevel('hard',this)"><span class="li">💀</span><div><div class="ln">ยาก</div><div class="ld">ตัวเลข 3 หลัก</div></div></div>
+      <div class="lbtn" onclick="selLevel('extreme',this)"><span class="li">☠️</span><div><div class="ln">ยากมาก</div><div class="ld">ตัวเลขขนาดใหญ่</div></div></div>
+    </div>
+    <button class="btn btn-p" id="levelNextBtn" style="opacity:.5" disabled onclick="startGame()">เริ่มเกม! ⚔️</button>
+  </div>
+</div>
+
+<!-- ===== WAITING (online host waits for guest) ===== -->
+<div class="screen" id="screen-waiting">
+  <div class="waitbox">
+    <div class="spinner"></div>
+    <div class="waittit" id="waitTitle">กำลังส่งคำเชิญ...</div>
+    <div class="waitsub" id="waitSub">รอเพื่อนตอบรับคำเชิญ</div>
+    <div class="opp-wait-badge">⚔️ <span id="waitOppName">-</span></div>
+    <button class="btn btn-s mt16" onclick="cancelOnlineWait()">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- ===== MODAL: INCOMING GAME INVITE ===== -->
+<div class="mover" id="inviteModal" style="display:none">
+  <div class="mbox">
+    <div class="mtit">⚔️ คำเชิญแข่งขัน!</div>
+    <div class="msub" id="inviteSub">มีคนชวนคุณเล่น</div>
+    <div class="flex-gap">
+      <button class="btn btn-g" onclick="acceptGameInvite()">ตอบรับ ✅</button>
+      <button class="btn btn-s" onclick="declineGameInvite()">ปฏิเสธ ❌</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: ABILITY PICK ===== -->
+<div class="mover" id="apModal" style="display:none">
+  <div class="mbox">
+    <div class="mtit">🃏 เลือกการ์ดความสามารถ</div>
+    <div class="msub" id="apSub">เลือก 1 ใบจาก 3 ใบ</div>
+    <div class="apgrid" id="apGrid"></div>
+    <button class="btn btn-pu" id="apConfirm" onclick="confirmAbPick()" style="opacity:.5" disabled>ยืนยันเลือก</button>
+  </div>
+</div>
+
+<!-- ===== MODAL: SWAP ===== -->
+<div class="mover" id="swapModal" style="display:none">
+  <div class="mbox">
+    <div class="mtit">🔄 สลับโจทย์?</div>
+    <div class="msub">ต้องการสลับโจทย์กับฝ่ายตรงข้ามไหม?</div>
+    <div class="flex-gap mt16">
+      <button class="btn btn-r" onclick="confirmSwap(true)">สลับ ✅</button>
+      <button class="btn btn-s" onclick="confirmSwap(false)">ไม่สลับ ❌</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GAME ===== -->
+<div class="screen" id="screen-game">
+  <div class="glayout">
+    <div class="ghdr">
+      <div class="phdr">
+        <div>
+          <div class="pntag" id="p1Name">P1</div>
+          <div class="hearts" id="p1Hearts"></div>
+        </div>
+      </div>
+      <div class="tc">
+        <div class="vstag">VS</div>
+        <div class="rdis" id="roundDis">รอบที่ 1</div>
+      </div>
+      <div class="phdr" style="flex-direction:row-reverse">
+        <div style="text-align:right">
+          <div class="pntag" id="p2Name">P2</div>
+          <div class="hearts" style="justify-content:flex-end" id="p2Hearts"></div>
+        </div>
+      </div>
+    </div>
+    <div id="statusArea" style="padding:0 16px"></div>
+    <div class="bsec">
+      <div class="rinfo">
+        <div class="rbadge" id="phaseBadge">เลือกการ์ดโจทย์</div>
+        <div class="pdesc" id="phaseDesc">แต่ละฝ่ายเลือก 1 ใบจากมือ</div>
+      </div>
+      <div class="qdis">
+        <div class="qcard" id="qCard">
+          <div class="qtxt" id="qText"><span class="qhid">? ? ?</span></div>
+        </div>
+        <div id="botArea" style="display:none">
+          <div class="botthink"><div class="d"></div><div class="d"></div><div class="d"></div><span id="botThinkTxt">บอทกำลังคิด...</span></div>
+        </div>
+      </div>
+      <div id="ansSec" style="display:none">
+        <div class="ansec">
+          <div>
+            <div class="albl" id="p1AnsLbl">P1</div>
+            <input type="number" class="ainp" id="p1Ans" placeholder="?" onkeydown="if(event.key==='Enter')submitAns(1)">
+            <button class="asbtn" id="p1Btn" onclick="submitAns(1)">ยืนยัน</button>
+          </div>
+          <div class="vsdiv">—</div>
+          <div>
+            <div class="albl" id="p2AnsLbl">P2</div>
+            <input type="number" class="ainp" id="p2Ans" placeholder="?" disabled onkeydown="if(event.key==='Enter')submitAns(2)">
+            <button class="asbtn" id="p2Btn" onclick="submitAns(2)" disabled>ยืนยัน</button>
+          </div>
+        </div>
+        <div id="mcWrap" style="display:none;margin-top:12px">
+          <div class="chgrid" id="chGrid"></div>
+        </div>
+      </div>
+    </div>
+    <div class="hsec hp1" id="p1HSec">
+      <div class="hhdr"><div class="clbl">🃏 <span id="p1HL">P1</span> — การ์ดโจทย์</div><div class="hhint">เลือก 1 ใบ</div></div>
+      <div class="hcards" id="p1HCards"></div>
+    </div>
+    <div class="hsec" id="p2HSec">
+      <div class="hhdr"><div class="clbl">🃏 <span id="p2HL">P2</span> — การ์ดโจทย์</div><div class="hhint" id="p2Hhint">รอฝ่ายตรงข้าม</div></div>
+      <div class="hcards" id="p2HCards"></div>
+    </div>
+    <div id="confBar" style="display:none" class="confbar">
+      <button class="btn btn-g" onclick="confirmCardSel()">✅ ยืนยันการ์ดที่เลือก</button>
+    </div>
+    <div class="csec">
+      <div class="abrow">
+        <div>
+          <div class="clbl">🌟 <span id="p1AL">P1</span> การ์ดพิเศษ</div>
+          <div class="crow" id="p1AbCards"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="clbl">🌟 <span id="p2AL">P2</span> การ์ดพิเศษ</div>
+          <div class="crow" id="p2AbCards" style="justify-content:flex-end"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ROUND RESULT ===== -->
+<div class="rrover" id="rrOver" style="display:none">
+  <div class="rrbox">
+    <div class="rico" id="rIcon">🏆</div>
+    <div class="rtit" id="rTitle">ชนะ!</div>
+    <div class="rsub" id="rSub"></div>
+    <div class="rdet" id="rDet"></div>
+    <button class="btn btn-p mt16" id="rrNextBtn" onclick="nextRound()">ถัดไป ▶</button>
+    <div class="waitsub mt16" id="rrWaitTxt" style="display:none">รอฝ่ายตรงข้ามไปต่อ...</div>
+  </div>
+</div>
+
+<!-- ===== GAME OVER ===== -->
+<div class="screen" id="screen-gameover">
+  <div class="goscreen">
+    <div class="goico" id="goIco">🏆</div>
+    <div class="gotit" id="goTit">ชนะ!</div>
+    <div class="gost" id="goSt">⭐</div>
+    <div class="godesc" id="goDesc"></div>
+    <div class="gostats" id="goStats"></div>
+    <div class="flex-gap">
+      <button class="btn btn-p" onclick="playAgain()">เล่นอีกครั้ง ↺</button>
+      <button class="btn btn-s" onclick="goHome()">หน้าหลัก 🏠</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script>
+/* ============================================================
+   FIREBASE INIT
+============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyC5efqRGgglJuJRyjQvF0pZ8KaZib7jxOI",
+  authDomain: "math-battle-legends-of-numbers.firebaseapp.com",
+  databaseURL: "https://math-battle-legends-of-numbers-default-rtdb.firebaseio.com",
+  projectId: "math-battle-legends-of-numbers",
+  storageBucket: "math-battle-legends-of-numbers.firebasestorage.app",
+  messagingSenderId: "663668971500",
+  appId: "1:663668971500:web:adc186e46d7fd27a2512c9",
+  measurementId: "G-EKY8S6QTJ4"
+};
+firebase.initializeApp(firebaseConfig);
+const fbdb = firebase.database();
+
+/* ============================================================
+   STORAGE HELPERS (backed by Firebase Realtime Database — works
+   across any device/browser, not just inside Claude.ai)
+   Key format used throughout the app: "prefix:rest" (e.g. "user:tom").
+   We map "prefix" -> a Firebase node name, and "rest" -> child key.
+============================================================ */
+const FB_NODE_MAP = {user:'users', friend:'friends', freq:'freqs', invite:'invites', game:'games', gact:'gacts'};
+function fbSanitize(s){ return String(s).replace(/[.#$\[\]\/]/g,'_'); }
+function fbPath(key){
+  const idx = key.indexOf(':');
+  if(idx<0) return fbSanitize(key);
+  const prefix = key.slice(0,idx);
+  const rest = key.slice(idx+1);
+  const node = FB_NODE_MAP[prefix] || fbSanitize(prefix);
+  return rest ? `${node}/${fbSanitize(rest)}` : node;
+}
+async function sGet(key){
+  try{
+    const snap = await fbdb.ref(fbPath(key)).once('value');
+    return snap.exists() ? snap.val() : null;
+  }catch(e){console.error('fb get fail',key,e);return null}
+}
+async function sSet(key, value){
+  try{
+    await fbdb.ref(fbPath(key)).set(value);
+    return {key,value};
+  }catch(e){console.error('fb set fail',key,e);return null}
+}
+async function sDel(key){
+  try{
+    await fbdb.ref(fbPath(key)).remove();
+    return {key,deleted:true};
+  }catch(e){console.error('fb del fail',key,e);return null}
+}
+async function sList(prefix){
+  try{
+    const idx = prefix.indexOf(':');
+    const p = idx>=0 ? prefix.slice(0,idx) : prefix;
+    const node = FB_NODE_MAP[p] || fbSanitize(p);
+    const snap = await fbdb.ref(node).once('value');
+    if(!snap.exists()) return [];
+    const obj = snap.val();
+    return Object.keys(obj).map(k=>prefix+k);
+  }catch(e){console.error('fb list fail',prefix,e);return []}
+}
+function keyOf(name){ return (name||'').trim().toLowerCase() }
+function hashPass(s){ let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return h.toString(16) }
+
+/* Personal (per-device) session so you stay logged in on this browser */
+const SESSION_KEY='mb_session';
+function loadSession(){ try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null} }
+function saveSession(s){ try{localStorage.setItem(SESSION_KEY,JSON.stringify(s))}catch(e){} }
+
+/* ============================================================
+   AUTH (players live in SHARED storage so any device can find them)
+============================================================ */
+function switchLoginTab(tab, el){
+  if(el){document.querySelectorAll('.login-tab').forEach(t=>t.classList.remove('active'));el.classList.add('login-tab active')}
+  else{document.querySelectorAll('.login-tab').forEach((t,i)=>{t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1))})}
+  document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
+  document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
+  document.getElementById('loginErrMsg').style.display='none';
+  document.getElementById('loginOkMsg').style.display='none';
+}
+function showLoginMsg(msg,isOk){
+  const e=document.getElementById('loginErrMsg'),o=document.getElementById('loginOkMsg');
+  if(isOk){o.textContent=msg;o.style.display='block';e.style.display='none'}
+  else{e.textContent=msg;e.style.display='block';o.style.display='none'}
+}
+async function doRegister(){
+  const name=(document.getElementById('regName').value||'').trim();
+  const pass=document.getElementById('regPass').value;
+  const pass2=document.getElementById('regPass2').value;
+  if(!name){showLoginMsg('กรุณาใส่ชื่อผู้เล่น');return}
+  if(name.length<2){showLoginMsg('ชื่อต้องมีอย่างน้อย 2 ตัวอักษร');return}
+  if(!pass||pass.length<4){showLoginMsg('รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร');return}
+  if(pass!==pass2){showLoginMsg('รหัสผ่านไม่ตรงกัน');return}
+  const key=keyOf(name);
+  const exist=await sGet('user:'+key,true);
+  if(exist){showLoginMsg('ชื่อนี้ถูกใช้แล้ว กรุณาเลือกชื่ออื่น');return}
+  const profile={name,pass:hashPass(pass),stars:0,wins:0,losses:0,created:Date.now(),lastSeen:Date.now()};
+  await sSet('user:'+key,JSON.stringify(profile),true);
+  showLoginMsg('สมัครสำเร็จ! กรุณาเข้าสู่ระบบ',true);
+  setTimeout(()=>switchLoginTab('login',null),1200);
+  document.getElementById('loginName').value=name;
+}
+async function doLogin(){
+  const name=(document.getElementById('loginName').value||'').trim();
+  const pass=document.getElementById('loginPass').value;
+  if(!name){showLoginMsg('กรุณาใส่ชื่อผู้เล่น');return}
+  if(!pass){showLoginMsg('กรุณาใส่รหัสผ่าน');return}
+  const key=keyOf(name);
+  const raw=await sGet('user:'+key,true);
+  if(!raw){showLoginMsg('ไม่พบชื่อผู้เล่นนี้');return}
+  const p=JSON.parse(raw);
+  if(p.pass!==hashPass(pass)){showLoginMsg('รหัสผ่านไม่ถูกต้อง');return}
+  saveSession({name:p.name});
+  afterLogin(p.name);
+}
+function doLogout(){
+  stopPresence();stopHomePolling();
+  saveSession(null);
+  showScreen('screen-login');
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginErrMsg').style.display='none';
+  document.getElementById('loginOkMsg').style.display='none';
+}
+async function afterLogin(name){
+  G.myName=name;G.myKey=keyOf(name);
+  await refreshMyProfile();
+  updateHomeProfile();
+  showScreen('screen-home');
+  startPresence();
+  goHome();
+}
+async function refreshMyProfile(){
+  const raw=await sGet('user:'+G.myKey,true);
+  if(raw)G.myProfile=JSON.parse(raw);
+}
+function updateHomeProfile(){
+  const name=G.myName||'ผู้เล่น';
+  document.getElementById('homeProfileName').textContent=name;
+  document.getElementById('homeProfileStars').textContent=`⭐ ${(G.myProfile&&G.myProfile.stars)||0} ดาว`;
+  document.getElementById('homeAvatar').textContent=name.charAt(0).toUpperCase();
+}
+let presenceTimer=null;
+function startPresence(){
+  stopPresence();
+  const beat=async()=>{
+    const raw=await sGet('user:'+G.myKey,true);
+    if(raw){const p=JSON.parse(raw);p.lastSeen=Date.now();await sSet('user:'+G.myKey,JSON.stringify(p),true);G.myProfile=p}
+  };
+  beat();
+  presenceTimer=setInterval(beat,15000);
+}
+function stopPresence(){if(presenceTimer){clearInterval(presenceTimer);presenceTimer=null}}
+
+/* ============================================================
+   ABILITY DEFINITIONS
+============================================================ */
+const ALL_AB=[
+  {id:'godMode',icon:'🛡️',name:'การ์ดกันตาย',desc:'เมื่อเหลือ 1HP แพ้ = ไม่เสียชีวิต (1ครั้ง)'},
+  {id:'swap',icon:'🔄',name:'การ์ดสลับโจทย์',desc:'สลับโจทย์กับฝ่ายตรงข้ามหลังเปิดการ์ด (1ครั้ง)'},
+  {id:'freeze',icon:'❄️',name:'การ์ดหยุดเวลา',desc:'ฝ่ายตรงข้ามตอบไม่ได้ 3 วิ (1ครั้ง)'},
+  {id:'hint',icon:'💡',name:'การช่วยตอบ',desc:'แสดง 4 ตัวเลือก มี 1 ถูก (1ครั้ง)'},
+  {id:'double',icon:'💀',name:'การ์ดลดชีวิต×2',desc:'ถ้าชนะรอบนี้ ฝ่ายตรงข้ามเสีย 2HP (1ครั้ง)'},
+  {id:'heal',icon:'❤️',name:'การ์ดเพิ่มชีวิต',desc:'เพิ่ม 1HP ทันที (1ครั้ง)'},
+  {id:'shield',icon:'🪬',name:'การ์ดป้องกัน',desc:'ป้องกัน สลับโจทย์ + ลดชีวิต×2 (1ครั้ง)'},
+  {id:'blur',icon:'🌫️',name:'การ์ดเบลอตัวเลข',desc:'เบลอเลข 1 ตัวในโจทย์ฝ่ายตรงข้าม (1ครั้ง)'}
+];
+
+/* ============================================================
+   GAME STATE
+   NOTE: p1 always = "me" locally (for both bot games and online games).
+   In online games the authoritative copy on the wire uses host=p1/guest=p2;
+   the guest device inverts fields on receipt so its own UI still treats p1 as "me".
+============================================================ */
+const G={
+  myName:'',myKey:'',myProfile:null,opName:'',isBot:false,botLv:null,topic:null,level:null,
+  mode:null, // null | 'bot' | 'online'
+  round:1,p1HP:5,p2HP:5,
+  p1Cards:[],p2Cards:[],p1Sel:null,p2Sel:null,
+  p1Ab:[],p2Ab:[],p1AbUsed:{},p2AbUsed:{},
+  p1God:false,p2God:false,p1Shield:false,p2Shield:false,
+  p1Dbl:false,p2Dbl:false,p1Frz:false,p2Frz:false,
+  curQ:null,p1Ans:null,p2Ans:null,p1Ms:null,p2Ms:null,qTime:null,
+  abRound:0,pendPP:null,abSelIdx:null,abPickFor:null,
+  botCancel:null,phase:'cardSelect',
+  online:null // {sessionId, role:'host'|'guest', lastGuestSeq, guestAbOptions, pollTimer, lastResultSig, abModalKey, overHandled}
+};
+let selTopic_=null,selLevel_=null,selBotLv_=null;
+
+/* ============================================================
+   MATH QUESTIONS
+============================================================ */
+function gcd(a,b){return b===0?a:gcd(b,a%b)}
+function ri(mn,mx){return Math.floor(Math.random()*(mx-mn+1))+mn}
+const LR={easy:[1,10],medium:[2,50],hard:[10,100],extreme:[20,500]};
+const MR={easy:[1,9],medium:[2,12],hard:[2,25],extreme:[5,50]};
+function genQ(topic,level){
+  const ts=['add','sub','mul','div'];
+  const t=topic==='mixed'?ts[ri(0,3)]:topic;
+  const[mn,mx]=LR[level];
+  const r=()=>ri(mn,mx);
+  if(t==='frac'){
+    const md=level==='easy'?6:level==='medium'?10:level==='hard'?16:20;
+    const d1=ri(2,md),d2=ri(2,md),n1=ri(1,d1-1),n2=ri(1,d2-1);
+    const nr=n1*d2+n2*d1,dr=d1*d2;
+    return{display:`${n1}/${d1} + ${n2}/${d2}`,ans:nr/dr,isFrac:true};
+  }
+  let a,b,ans,display;
+  if(t==='add'){a=r();b=r();ans=a+b;display=`${a} + ${b}`}
+  else if(t==='sub'){a=r();b=r();if(a<b)[a,b]=[b,a];ans=a-b;display=`${a} − ${b}`}
+  else if(t==='mul'){const[mm,mx2]=MR[level];a=ri(mm,mx2);b=ri(mm,mx2);ans=a*b;display=`${a} × ${b}`}
+  else{const divs=[2,3,4,5,6,7,8,9,10,11,12];b=divs[ri(0,Math.min(divs.length-1,level==='easy'?3:level==='medium'?7:11))];ans=r();a=ans*b;display=`${a} ÷ ${b}`}
+  return{display,ans,isFrac:false};
+}
+function genHand(n){return Array.from({length:n},(_,i)=>({id:`c_${Date.now()}_${i}_${Math.random().toString(36).slice(2)}`,q:genQ(G.topic,G.level),used:false}))}
+function isCorrect(val,q){const v=parseFloat(val);if(isNaN(v))return false;return Math.abs(v-q.ans)<=(q.isFrac?0.005:0)}
+
+/* ============================================================
+   BOOT
+============================================================ */
+document.addEventListener('DOMContentLoaded',()=>{
+  createStars();
+  const sess=loadSession();
+  if(sess&&sess.name){
+    sGet('user:'+keyOf(sess.name),true).then(raw=>{
+      if(raw)afterLogin(JSON.parse(raw).name);
+      else{saveSession(null);showScreen('screen-login')}
+    });
+  }else showScreen('screen-login');
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){['apModal','swapModal','inviteModal'].forEach(id=>{const el=document.getElementById(id);if(el&&id!=='inviteModal')el.style.display='none'})}
+  });
+});
+function createStars(){
+  const c=document.getElementById('starsBg');
+  for(let i=0;i<90;i++){const s=document.createElement('div');s.className='star';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*5}s;animation-delay:${Math.random()*5}s;opacity:${.1+Math.random()*.4}`;c.appendChild(s)}
+}
+
+/* ============================================================
+   SCREEN NAV
+============================================================ */
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id)?.classList.add('active');window.scrollTo(0,0)}
+function goHome(){
+  stopOnlinePolling();
+  showScreen('screen-home');
+  updateHomeProfile();
+  renderLB();
+  renderFriendsTab();
+  startHomePolling();
+}
+
+/* ============================================================
+   HOME TABS
+============================================================ */
+function switchTab(tab,e){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  e?.currentTarget?.classList.add('active');
+  ['online','bot','lb'].forEach(t=>{document.getElementById(`tab-${t}`).style.display=t===tab?'block':'none'});
+  if(tab==='lb')renderLB();
+  if(tab==='online')renderFriendsTab();
+}
+
+/* ============================================================
+   FRIENDS, REQUESTS, SEARCH  (all shared storage)
+============================================================ */
+async function getFriends(key){ try{return JSON.parse(await sGet('friend:'+key,true)||'[]')}catch(e){return[]} }
+async function setFriends(key,arr){ await sSet('friend:'+key,JSON.stringify(arr),true) }
+async function getReqs(key){ try{return JSON.parse(await sGet('freq:'+key,true)||'[]')}catch(e){return[]} }
+async function setReqs(key,arr){ await sSet('freq:'+key,JSON.stringify(arr),true) }
+
+async function renderFriendsTab(){
+  const [friends,reqs]=await Promise.all([getFriends(G.myKey),getReqs(G.myKey)]);
+  const reqBadge=document.getElementById('reqBadge');
+  reqBadge.style.display=reqs.length?'block':'none';reqBadge.textContent=reqs.length;
+  const reqBox=document.getElementById('reqBox');
+  if(reqs.length){
+    reqBox.style.display='block';
+    reqBox.innerHTML=`<div class="reqbox"><div class="mtitle" style="margin-bottom:8px">💌 คำขอเป็นเพื่อน (${reqs.length})</div>`+
+      reqs.map(r=>`<div class="fi"><span class="fn">${esc(r.from)}</span><span class="flex-gap" style="width:auto"><button class="btn btn-g smallbtn" onclick="acceptFriendReq('${esc(r.from)}')">ตอบรับ</button><button class="btn btn-s smallbtn" onclick="declineFriendReq('${esc(r.from)}')">ปฏิเสธ</button></span></div>`).join('')+
+      `</div>`;
+  }else{reqBox.style.display='none';reqBox.innerHTML=''}
+
+  const el=document.getElementById('friendsList');
+  if(!friends.length){el.innerHTML=`<div class="tmuted" style="padding:8px 0;text-align:center">ยังไม่มีเพื่อน<br><small>ค้นหาชื่อด้านล่างเพื่อเพิ่มเพื่อน!</small></div>`;return}
+  const profiles=await Promise.all(friends.map(n=>sGet('user:'+keyOf(n),true)));
+  const now=Date.now();
+  const rows=friends.map((n,i)=>{
+    const p=profiles[i]?JSON.parse(profiles[i]):null;
+    const online=p&&(now-(p.lastSeen||0))<40000;
+    return{name:n,stars:p?p.stars:0,online};
+  }).sort((a,b)=>(b.online-a.online)||(b.stars-a.stars));
+  el.innerHTML=rows.map(f=>`
+    <div class="fi">
+      <span>
+        <span class="${f.online?'dot-on':'dot-off'}"></span>
+        <span><span class="fn">${esc(f.name)}</span><div class="fstars">⭐ ${f.stars||0} ดาว ${f.online?'· ออนไลน์':'· ออฟไลน์'}</div></span>
+      </span>
+      <button class="btn ${f.online?'btn-b':'btn-s'} smallbtn" ${f.online?'':'disabled'} onclick="sendGameInvite('${esc(f.name)}')">⚔️ ชวนเล่น</button>
+    </div>`).join('');
+}
+
+let searchTimer=null;
+function searchFriend(v){
+  clearTimeout(searchTimer);
+  const q=(v||'').trim();
+  const r=document.getElementById('searchResults');
+  if(!q){r.innerHTML='';return}
+  searchTimer=setTimeout(()=>doSearchFriend(q),300);
+}
+async function doSearchFriend(q){
+  const r=document.getElementById('searchResults');
+  r.innerHTML=`<div class="tmuted" style="padding:6px 0">กำลังค้นหา...</div>`;
+  const keys=await sList('user:',true);
+  const matches=[];
+  for(const k of keys){
+    const short=k.slice(5);
+    if(!short.includes(q.toLowerCase()))continue;
+    if(short===G.myKey)continue;
+    const raw=await sGet(k,true);
+    if(raw)matches.push(JSON.parse(raw));
+    if(matches.length>=8)break;
+  }
+  if(!matches.length){r.innerHTML=`<div class="tmuted" style="padding:8px 0">ไม่พบผู้เล่น "${esc(q)}"</div>`;return}
+  const [friends,myReqsSentKeys]=await Promise.all([getFriends(G.myKey),getSentRequestTargets()]);
+  r.innerHTML=matches.map(p=>{
+    const isFriend=friends.includes(p.name);
+    const pending=myReqsSentKeys.includes(keyOf(p.name));
+    let btn;
+    if(isFriend)btn=`<span class="tmuted" style="font-size:11px">เพื่อนแล้ว ✓</span>`;
+    else if(pending)btn=`<span class="tmuted" style="font-size:11px">รอตอบรับ...</span>`;
+    else btn=`<button class="btn btn-g smallbtn" onclick="addFriendReq('${esc(p.name)}')">➕ เพิ่มเพื่อน</button>`;
+    return `<div class="fi"><span><span class="fn">${esc(p.name)}</span><div class="fstars">⭐ ${p.stars||0} ดาว</div></span>${btn}</div>`;
+  }).join('');
+}
+async function getSentRequestTargets(){
+  // best-effort: we don't index "sent" separately, so just check each candidate's inbox when needed instead.
+  return G._sentReqCache||[];
+}
+async function addFriendReq(name){
+  const tkey=keyOf(name);
+  if(tkey===G.myKey)return;
+  const reqs=await getReqs(tkey);
+  if(reqs.find(r=>keyOf(r.from)===G.myKey)){showStatusHome('ส่งคำขอไปแล้ว รอการตอบรับ','si');return}
+  reqs.push({from:G.myName,ts:Date.now()});
+  await setReqs(tkey,reqs);
+  G._sentReqCache=[...(G._sentReqCache||[]),tkey];
+  showStatusHome(`✅ ส่งคำขอเป็นเพื่อนถึง ${esc(name)} แล้ว`,'sw');
+  searchFriend(document.getElementById('searchInput').value);
+}
+async function acceptFriendReq(fromName){
+  const [myF,theirF,myR]=await Promise.all([getFriends(G.myKey),getFriends(keyOf(fromName)),getReqs(G.myKey)]);
+  if(!myF.includes(fromName))myF.push(fromName);
+  if(!theirF.includes(G.myName))theirF.push(G.myName);
+  const newR=myR.filter(r=>keyOf(r.from)!==keyOf(fromName));
+  await Promise.all([setFriends(G.myKey,myF),setFriends(keyOf(fromName),theirF),setReqs(G.myKey,newR)]);
+  showStatusHome(`🎉 คุณและ ${esc(fromName)} เป็นเพื่อนกันแล้ว!`,'sw');
+  renderFriendsTab();
+}
+async function declineFriendReq(fromName){
+  const myR=await getReqs(G.myKey);
+  await setReqs(G.myKey,myR.filter(r=>keyOf(r.from)!==keyOf(fromName)));
+  renderFriendsTab();
+}
+function showStatusHome(msg,cls){
+  const box=document.getElementById('reqBox');
+  const d=document.createElement('div');d.className=`smsg ${cls}`;d.textContent=msg;
+  box.parentNode.insertBefore(d,box);
+  setTimeout(()=>d.remove(),3000);
+}
+
+/* ============================================================
+   HOME POLLING (friend requests + incoming game invites)
+============================================================ */
+let homePollTimer=null;
+function startHomePolling(){
+  stopHomePolling();
+  const tick=async()=>{
+    if(document.getElementById('screen-home').classList.contains('active'))renderFriendsTab();
+    await checkIncomingInvite();
+  };
+  tick();
+  homePollTimer=setInterval(tick,4000);
+}
+function stopHomePolling(){if(homePollTimer){clearInterval(homePollTimer);homePollTimer=null}}
+
+async function checkIncomingInvite(){
+  if(G.online)return; // already in a match
+  if(document.getElementById('inviteModal').style.display==='flex')return;
+  const raw=await sGet('invite:'+G.myKey,true);
+  if(!raw)return;
+  let inv;try{inv=JSON.parse(raw)}catch(e){return}
+  if(!inv||G._dismissedInviteTs===inv.ts)return;
+  G._pendingInvite=inv;
+  document.getElementById('inviteSub').textContent=`${inv.from} ชวนคุณเล่น (หัวข้อ: ${topicLabel(inv.topic)})`;
+  document.getElementById('inviteModal').style.display='flex';
+}
+function topicLabel(t){return {add:'การบวก',sub:'การลบ',mul:'การคูณ',div:'การหาร',mixed:'รวมทุกอย่าง',frac:'เศษส่วน'}[t]||t}
+
+async function declineGameInvite(){
+  const inv=G._pendingInvite;
+  document.getElementById('inviteModal').style.display='none';
+  if(!inv)return;
+  G._dismissedInviteTs=inv.ts;
+  await sDel('invite:'+G.myKey,true);
+  await sSet('game:'+inv.sessionId,JSON.stringify({status:'declined'}),true);
+}
+async function acceptGameInvite(){
+  const inv=G._pendingInvite;
+  document.getElementById('inviteModal').style.display='none';
+  if(!inv)return;
+  await sDel('invite:'+G.myKey,true);
+  G.opName=inv.from;G.topic=inv.topic;G.level=inv.level||'medium';G.isBot=false;G.mode='online';
+  G.online={sessionId:inv.sessionId,role:'guest',lastGuestSeq:0,abModalKey:null,lastResultSig:null,overHandled:false};
+  stopHomePolling();
+  await sSet('game:'+inv.sessionId,JSON.stringify({status:'accepted',acceptedAt:Date.now()}),true);
+  showScreen('screen-waiting');
+  document.getElementById('waitTitle').textContent='กำลังเข้าร่วมเกม...';
+  document.getElementById('waitSub').textContent='รอเจ้าของห้องเริ่มเกม';
+  document.getElementById('waitOppName').textContent=inv.from;
+  startGuestJoinPoll();
+}
+
+/* ============================================================
+   BOT SETUP
+============================================================ */
+function selBotLv(lv,el){
+  selBotLv_=lv;
+  document.querySelectorAll('#botLevelList .lbtn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  const btn=document.getElementById('botStartBtn');btn.disabled=false;btn.style.opacity='1';
+}
+function startVsBot(){
+  if(!selBotLv_)return;
+  G.mode='bot';G.isBot=true;G.botLv=selBotLv_;G.online=null;
+  G.opName={easy:'บอท (ง่าย)',medium:'บอท (ปานกลาง)',hard:'บอท (ยาก)'}[selBotLv_];
+  showScreen('screen-topic');
+}
+
+/* ============================================================
+   TOPIC & LEVEL
+============================================================ */
+function selTopic(t,el){
+  selTopic_=t;G.topic=t;
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  const btn=document.getElementById('topicNextBtn');btn.disabled=false;btn.style.opacity='1';
+}
+function selLevel(lv,el){
+  selLevel_=lv;G.level=lv;
+  document.querySelectorAll('#diffLvList .lbtn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  const btn=document.getElementById('levelNextBtn');btn.disabled=false;btn.style.opacity='1';
+}
+function cancelSetup(){
+  G.mode=null;G.isBot=false;
+  showScreen('screen-home');
+}
+function afterTopicPicked(){
+  if(G.mode==='online'){
+    // no difficulty screen for friend matches — send the invite straight away
+    G.level='medium';
+    createOnlineInvite();
+  }else{
+    showScreen('screen-level');
+  }
+}
+
+/* ============================================================
+   ONLINE: HOST CREATES INVITE
+============================================================ */
+function sendGameInvite(friendName){
+  G.mode='online';G.isBot=false;G.opName=friendName;G.online=null;
+  showScreen('screen-topic');
+}
+async function createOnlineInvite(){
+  const sessionId='s'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  G.online={sessionId,role:'host',lastGuestSeq:0,guestKey:keyOf(G.opName)};
+  await sSet('invite:'+keyOf(G.opName),JSON.stringify({from:G.myName,sessionId,topic:G.topic,level:G.level,ts:Date.now()}),true);
+  await sSet('game:'+sessionId,JSON.stringify({status:'inviting'}),true);
+  stopHomePolling();
+  showScreen('screen-waiting');
+  document.getElementById('waitTitle').textContent='กำลังส่งคำเชิญ...';
+  document.getElementById('waitSub').textContent='รอเพื่อนตอบรับคำเชิญ';
+  document.getElementById('waitOppName').textContent=G.opName;
+  startHostWaitPoll();
+}
+let waitPollTimer=null;
+function startHostWaitPoll(){
+  stopWaitPoll();
+  waitPollTimer=setInterval(async()=>{
+    const raw=await sGet('game:'+G.online.sessionId,true);
+    if(!raw)return;
+    let st;try{st=JSON.parse(raw)}catch(e){return}
+    if(st.status==='accepted'){stopWaitPoll();beginOnlineMatchAsHost()}
+    else if(st.status==='declined'){stopWaitPoll();showScreen('screen-home');goHome();alert(`${G.opName} ปฏิเสธคำเชิญ`)}
+  },2000);
+}
+function startGuestJoinPoll(){
+  stopWaitPoll();
+  waitPollTimer=setInterval(async()=>{
+    const raw=await sGet('game:'+G.online.sessionId,true);
+    if(!raw)return;
+    let st;try{st=JSON.parse(raw)}catch(e){return}
+    if(st.status==='active'){stopWaitPoll();beginOnlineMatchAsGuest(st)}
+  },1500);
+}
+function stopWaitPoll(){if(waitPollTimer){clearInterval(waitPollTimer);waitPollTimer=null}}
+function cancelOnlineWait(){
+  stopWaitPoll();
+  if(G.online){sDel('game:'+G.online.sessionId,true);if(G.online.role==='host')sDel('invite:'+keyOf(G.opName),true)}
+  G.online=null;G.mode=null;
+  showScreen('screen-home');goHome();
+}
+
+/* ============================================================
+   ONLINE GAME START
+============================================================ */
+function beginOnlineMatchAsHost(){
+  G.round=1;G.p1HP=5;G.p2HP=5;G.phase='cardSelect';G.abRound=0;
+  G.p1Ab=[];G.p2Ab=[];G.p1AbUsed={};G.p2AbUsed={};
+  G.p1God=false;G.p2God=false;G.p1Shield=false;G.p2Shield=false;
+  G.p1Dbl=false;G.p2Dbl=false;G.p1Frz=false;G.p2Frz=false;
+  G.p1Cards=genHand(5);G.p2Cards=genHand(5);
+  G.p1Sel=null;G.p2Sel=null;
+  showScreen('screen-game');
+  applyOnlineUiMode();
+  updateUI();
+  hostPushState();
+  startOnlinePolling();
+  setTimeout(()=>openAbPick(0),400);
+}
+function beginOnlineMatchAsGuest(st){
+  showScreen('screen-game');
+  applyOnlineUiMode();
+  applyRemoteStateToLocal(st);
+  updateUI();
+  guestRenderFrame(st);
+  startOnlinePolling();
+}
+function applyOnlineUiMode(){
+  document.getElementById('p2Hhint').textContent='ควบคุมโดยฝ่ายตรงข้าม';
+}
+
+/* ============================================================
+   ONLINE SYNC: HOST SIDE
+============================================================ */
+function stateSnapshot(){
+  return{
+    host:G.myName,guest:G.opName,topic:G.topic,level:G.level,status:'active',
+    round:G.round,p1HP:G.p1HP,p2HP:G.p2HP,
+    p1Cards:G.p1Cards,p2Cards:G.p2Cards,p1Sel:G.p1Sel,p2Sel:G.p2Sel,
+    p1Ab:G.p1Ab,p2Ab:G.p2Ab,p1AbUsed:G.p1AbUsed,p2AbUsed:G.p2AbUsed,
+    p1Flags:{god:G.p1God,shield:G.p1Shield,dbl:G.p1Dbl,frz:G.p1Frz},
+    p2Flags:{god:G.p2God,shield:G.p2Shield,dbl:G.p2Dbl,frz:G.p2Frz},
+    phase:G.phase,abRound:G.abRound,abPickFor:G.abPickFor,guestAbOptions:G.online.guestAbOptions||null,
+    curQ:G.curQ,qTime:G.qTime,p1Ans:G.p1Ans,p2Ans:G.p2Ans,p1Ms:G.p1Ms,p2Ms:G.p2Ms,
+    lastResult:G.online.lastResult||null,
+    version:(G.online.version=(G.online.version||0)+1),updatedAt:Date.now()
+  };
+}
+async function hostPushState(){
+  if(!G.online||G.online.role!=='host')return;
+  await sSet('game:'+G.online.sessionId,JSON.stringify(stateSnapshot()),true);
+}
+let onlinePollTimer=null;
+function startOnlinePolling(){
+  stopOnlinePolling();
+  onlinePollTimer=setInterval(async()=>{
+    if(!G.online)return;
+    if(G.online.role==='host')await hostPollGuestAction();
+    else await guestPollState();
+  },1000);
+}
+function stopOnlinePolling(){if(onlinePollTimer){clearInterval(onlinePollTimer);onlinePollTimer=null}}
+
+async function hostPollGuestAction(){
+  const raw=await sGet('gact:'+G.online.sessionId,true);
+  if(!raw)return;
+  let act;try{act=JSON.parse(raw)}catch(e){return}
+  if(!act||act.seq<=(G.online.lastGuestSeq||0))return;
+  G.online.lastGuestSeq=act.seq;
+  applyGuestAction(act);
+}
+function applyGuestAction(act){
+  const {type,payload}=act;
+  if(type==='selectCard'){
+    if(G.phase!=='cardSelect'||G.p2Sel!==null)return;
+    if(!G.p2Cards[payload.idx]||G.p2Cards[payload.idx].used)return;
+    G.p2Sel=payload.idx;renderHandCards();checkConf();hostPushState();
+  }else if(type==='submitAnswer'){
+    if(G.phase!=='answer'||G.p2Ans!==null)return;
+    G.p2Ans=payload.val;G.p2Ms=Date.now()-G.qTime;
+    if(G.p1Ans!==null)evalRound();else hostPushState();
+  }else if(type==='useAbility'){
+    useAbility('p2',payload.id);
+  }else if(type==='swapDecision'){
+    confirmSwap(payload.doIt);
+  }else if(type==='pickAbility'){
+    if(G.abPickFor!=='p2'||!G.online.guestAbOptions)return;
+    const card={...G.online.guestAbOptions[payload.idx]};
+    G.p2Ab.push(card);G.abPickFor=null;G.online.guestAbOptions=null;
+    finishAbPick(1);hostPushState();
+  }else if(type==='nextRoundAck'){
+    /* no-op: pacing controlled by host */
+  }
+}
+
+/* ============================================================
+   ONLINE SYNC: GUEST SIDE
+============================================================ */
+async function guestPollState(){
+  const raw=await sGet('game:'+G.online.sessionId,true);
+  if(!raw)return;
+  let st;try{st=JSON.parse(raw)}catch(e){return}
+  if(!st||st.status!=='active')return;
+  if(st.version===G.online.lastVersion)return;
+  G.online.lastVersion=st.version;
+  applyRemoteStateToLocal(st);
+  guestRenderFrame(st);
+}
+function applyRemoteStateToLocal(st){
+  G.opName=st.host;G.myName=G.myName||st.guest;G.topic=st.topic;G.level=st.level;
+  G.round=st.round;
+  G.p1HP=st.p2HP;G.p2HP=st.p1HP;
+  G.p1Cards=st.p2Cards;G.p2Cards=st.p1Cards;
+  G.p1Sel=st.p2Sel;G.p2Sel=st.p1Sel;
+  G.p1Ab=st.p2Ab;G.p2Ab=st.p1Ab;
+  G.p1AbUsed=st.p2AbUsed;G.p2AbUsed=st.p1AbUsed;
+  G.p1God=st.p2Flags.god;G.p2God=st.p1Flags.god;
+  G.p1Shield=st.p2Flags.shield;G.p2Shield=st.p1Flags.shield;
+  G.p1Dbl=st.p2Flags.dbl;G.p2Dbl=st.p1Flags.dbl;
+  G.p1Frz=st.p2Flags.frz;G.p2Frz=st.p1Flags.frz;
+  G.curQ=st.curQ;G.qTime=st.qTime;
+  G.p1Ans=st.p2Ans;G.p2Ans=st.p1Ans;
+  G.p1Ms=st.p2Ms;G.p2Ms=st.p1Ms;
+  G.phase=st.phase;G.abRound=st.abRound;
+  G.abPickFor=st.abPickFor==='p2'?'p1':(st.abPickFor==='p1'?'p2':null);
+  G.online.guestAbOptions=st.guestAbOptions||null;
+  G.online.remoteLastResult=st.lastResult||null;
+}
+function guestRenderFrame(st){
+  updateUI();
+  renderHearts();renderHandCards();renderAbCards();setPhaseBadge();
+
+  if(G.phase==='cardSelect'){
+    document.getElementById('rrOver').style.display='none';
+    resetQDisplay();
+  }
+  if(G.phase==='answer'){
+    document.getElementById('rrOver').style.display='none';
+    const already=document.getElementById('ansSec').style.display==='block'&&document.getElementById('qText').textContent===G.curQ.display;
+    if(!already)openGuestAnswerUI();
+    syncAnswerButtons();
+  }
+  if(G.phase==='result'){
+    const sig=G.round+'|'+(st.updatedAt||0);
+    if(G.online.lastResultSig!==sig){
+      G.online.lastResultSig=sig;
+      const r=G.online.remoteLastResult;
+      if(r)showRR(r.winner,r.c1,r.c2,r.extra,true);
+    }
+  }
+  // ability pick for me
+  if(G.abPickFor==='p1'&&G.online.guestAbOptions){
+    const key='pick-'+G.round+'-'+G.abRound;
+    if(G.online.abModalKey!==key&&document.getElementById('apModal').style.display!=='flex'){
+      G.online.abModalKey=key;
+      openLocalAbPickModal(G.online.guestAbOptions,G.myName);
+    }
+  }
+  if(G.phase==='over'&&!G.online.overHandled){
+    G.online.overHandled=true;
+    finishOnlineGame(st);
+  }
+}
+function openGuestAnswerUI(){
+  document.getElementById('qCard').classList.add('rev');
+  document.getElementById('qText').textContent=G.curQ.display;
+  document.getElementById('ansSec').style.display='block';
+  document.getElementById('p1HSec').style.display='none';
+  document.getElementById('p2HSec').style.display='none';
+  document.getElementById('confBar').style.display='none';
+  const i1=document.getElementById('p1Ans');i1.value='';i1.disabled=false;
+  document.getElementById('p1Btn').disabled=false;
+  i1.focus();
+}
+function syncAnswerButtons(){
+  const i1=document.getElementById('p1Ans'),b1=document.getElementById('p1Btn');
+  if(G.p1Ans!==null){i1.disabled=true;b1.disabled=true}
+}
+function openLocalAbPickModal(avail,forName){
+  G.pendPP=0;G.abSelIdx=null;
+  document.getElementById('apSub').textContent=`${esc(forName)}: เลือก 1 ใบจาก 3 ใบ`;
+  const grid=document.getElementById('apGrid');
+  grid._ch=avail;
+  grid.innerHTML=avail.map((a,i)=>`<div class="apc" id="apc${i}" onclick="selAbCard(${i})"><div class="api">${a.icon}</div><div class="apn">${a.name}</div><div class="apd">${a.desc}</div></div>`).join('');
+  const cb=document.getElementById('apConfirm');cb.disabled=true;cb.style.opacity='0.5';
+  document.getElementById('apModal').style.display='flex';
+}
+async function finishOnlineGame(st){
+  const w1=st.p2HP<=0&&st.p1HP>0, w2=st.p1HP<=0&&st.p2HP>0;
+  const iAmHost=G.online.role==='host';
+  const iWon=iAmHost?w1:w2, iLost=iAmHost?w2:w1;
+  if(iWon)await updateMyStars(1,true);
+  else if(iLost)await updateMyStars(-1,false);
+  document.getElementById('goIco').textContent=iWon?'🏆':iLost?'💔':'🤝';
+  document.getElementById('goTit').textContent=iWon?`${esc(G.myName)} ชนะ! 🎉`:iLost?`${esc(G.opName)} ชนะ!`:'เสมอ! 🤝';
+  document.getElementById('goSt').textContent=iWon?'⭐ +1 ดาว':iLost?'💔 −1 ดาว':'➖ ±0 ดาว';
+  document.getElementById('goDesc').textContent=`เล่นกับ ${esc(G.opName)}`;
+  document.getElementById('goStats').innerHTML=`
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>❤️ ${esc(G.myName)}</span><strong>${G.p1HP} HP</strong></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span>❤️ ${esc(G.opName)}</span><strong>${G.p2HP} HP</strong></div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">ดาวของคุณ: <strong style="color:var(--gold)">⭐ ${(G.myProfile&&G.myProfile.stars)||0}</strong></div>`;
+  stopOnlinePolling();
+  showScreen('screen-gameover');renderLB();
+}
+async function updateMyStars(delta,isWin){
+  const raw=await sGet('user:'+G.myKey,true);
+  if(!raw)return;
+  const p=JSON.parse(raw);
+  p.stars=Math.max(0,(p.stars||0)+delta);
+  if(isWin)p.wins=(p.wins||0)+1;else p.losses=(p.losses||0)+1;
+  await sSet('user:'+G.myKey,JSON.stringify(p),true);
+  G.myProfile=p;
+}
+
+/* ============================================================
+   LEADERBOARD
+============================================================ */
+async function renderLB(){
+  const el=document.getElementById('lbList');if(!el)return;
+  const keys=await sList('user:',true);
+  const profiles=(await Promise.all(keys.slice(0,60).map(k=>sGet(k,true)))).filter(Boolean).map(r=>JSON.parse(r));
+  profiles.sort((a,b)=>(b.stars||0)-(a.stars||0));
+  const all=profiles.slice(0,10);
+  if(!all.length){el.innerHTML=`<div class="tmuted tc" style="padding:20px">ยังไม่มีข้อมูล</div>`;return}
+  el.innerHTML=all.map((p,i)=>{
+    const rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    const m=i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+    const isMe=p.name===G.myName;
+    return`<div class="lbi" style="${isMe?'border-color:var(--accent);background:rgba(245,158,11,.07)':''}"><div class="lbr ${rc}">${m}</div><div class="lbn">${esc(p.name)}${isMe?' 👈':''}</div><div class="lbs">⭐ ${p.stars||0}</div></div>`;
+  }).join('');
+}
+
+/* ============================================================
+   GAME START / RESET  (bot + local logic; also used by host)
+============================================================ */
+function startGame(){
+  if(!G.level)return;
+  G.mode='bot';G.online=null;
+  G.round=1;G.p1HP=5;G.p2HP=5;G.phase='cardSelect';G.abRound=0;
+  G.p1Ab=[];G.p2Ab=[];G.p1AbUsed={};G.p2AbUsed={};
+  G.p1God=false;G.p2God=false;G.p1Shield=false;G.p2Shield=false;
+  G.p1Dbl=false;G.p2Dbl=false;G.p1Frz=false;G.p2Frz=false;
+  G.p1Cards=genHand(5);G.p2Cards=genHand(5);
+  G.p1Sel=null;G.p2Sel=null;
+  showScreen('screen-game');
+  document.getElementById('p2Hhint').textContent='ควบคุมโดยบอท';
+  updateUI();
+  setTimeout(()=>openAbPick(0),400);
+}
+function playAgain(){
+  if(G.botCancel){G.botCancel();G.botCancel=null}
+  if(G.mode==='online'){goHome();return} // online rematches go through invite flow again
+  startGame();
+}
+function resetRound(){
+  G.p1God=false;G.p2God=false;G.p1Shield=false;G.p2Shield=false;
+  G.p1Dbl=false;G.p2Dbl=false;G.p1Frz=false;G.p2Frz=false;
+  G.p1Ans=null;G.p2Ans=null;G.p1Ms=null;G.p2Ms=null;G.qTime=null;
+  G.curQ=null;G.p1Sel=null;G.p2Sel=null;
+}
+
+/* ============================================================
+   CARD SELECTION
+============================================================ */
+function selCard(player,idx){
+  if(player!=='p1')return; // opponent side is never directly clickable anymore
+  if(G.phase!=='cardSelect')return;
+  const cards=G.p1Cards;
+  if(!cards[idx]||cards[idx].used)return;
+  G.p1Sel=idx;
+  renderHandCards();
+  if(G.mode==='online'){
+    if(G.online.role==='guest'){sendGuestAction('selectCard',{idx});return}
+    checkConf();hostPushState();return;
+  }
+  if(G.isBot&&G.p2Sel===null){
+    const av=G.p2Cards.map((c,i)=>({c,i})).filter(x=>!x.c.used);
+    if(av.length)G.p2Sel=av[Math.floor(Math.random()*av.length)].i;
+    renderHandCards();
+  }
+  checkConf();
+}
+function checkConf(){
+  const showBtn=G.mode!=='online'||G.online.role==='host';
+  const ok=showBtn&&G.p1Sel!==null&&G.p2Sel!==null;
+  document.getElementById('confBar').style.display=ok?'block':'none';
+}
+function confirmCardSel(){
+  if(G.p1Sel===null||G.p2Sel===null)return;
+  G.phase='answer';revealQ();
+  if(G.mode==='online'&&G.online.role==='host')hostPushState();
+}
+
+/* ============================================================
+   REVEAL QUESTION
+============================================================ */
+function revealQ(){
+  G.curQ={...G.p1Cards[G.p1Sel].q};
+  G.qTime=Date.now();
+  document.getElementById('qCard').classList.add('rev');
+  document.getElementById('qText').textContent=G.curQ.display;
+  const as=document.getElementById('ansSec');as.style.display='block';
+  const i1=document.getElementById('p1Ans'),i2=document.getElementById('p2Ans');
+  const b1=document.getElementById('p1Btn'),b2=document.getElementById('p2Btn');
+  i1.value='';i1.disabled=false;b1.disabled=false;
+  i2.value='';i2.disabled=true;b2.disabled=true; // opponent input is remote/bot-controlled, never local
+  document.getElementById('p1HSec').style.display='none';
+  document.getElementById('p2HSec').style.display='none';
+  document.getElementById('confBar').style.display='none';
+  setPhaseBadge();
+  if(G.p2Frz)applyFreezeUI('p2',3);
+  if(G.p1Frz)applyFreezeUI('p1',3);
+  i1.focus();
+  if(G.isBot){
+    document.getElementById('botArea').style.display='block';
+    const ba=botDecideAb();
+    if(ba)setTimeout(()=>useAbility('p2',ba),600);
+    const cfg={easy:[4500,10000,.35],medium:[2000,5000,.15],hard:[700,2500,.03]}[G.botLv]||[2000,5000,.15];
+    const delay=cfg[0]+Math.random()*(cfg[1]-cfg[0]);
+    let cancelled=false;
+    const t=setTimeout(()=>{
+      if(cancelled||G.phase!=='answer'||G.p2Ans!==null)return;
+      document.getElementById('botArea').style.display='none';
+      let ans=G.curQ.ans;
+      if(Math.random()<cfg[2]){const off=Math.ceil(Math.random()*Math.max(3,Math.abs(ans)*.25));ans=ans+(Math.random()<.5?off:-off);ans=G.curQ.isFrac?parseFloat(ans.toFixed(2)):Math.round(ans)}
+      G.p2Ans=ans;G.p2Ms=Date.now()-G.qTime;
+      if(G.p1Ans!==null)evalRound();
+    },delay);
+    G.botCancel=()=>{cancelled=true;clearTimeout(t)};
+  }else if(G.mode==='online'){
+    document.getElementById('botArea').style.display='block';
+    document.getElementById('botThinkTxt').textContent=`${esc(G.opName)} กำลังตอบ...`;
+  }
+}
+function botDecideAb(){
+  const ord={easy:['heal','hint','shield','godMode'],medium:['heal','freeze','double','hint'],hard:['double','freeze','blur','swap','heal']}[G.botLv]||[];
+  for(const id of ord){if(G.p2Ab.find(a=>a.id===id)&&!G.p2AbUsed[id]&&canUseAb(id,'answer'))return id}
+  return null;
+}
+function canUseAb(id,phase){
+  const inst=['godMode','shield','heal','double'];
+  return inst.includes(id)||phase==='answer';
+}
+function applyFreezeUI(player,sec){
+  const n=player==='p1'?1:2;
+  const inp=document.getElementById(`p${n}Ans`),btn=document.getElementById(`p${n}Btn`);
+  if(!inp)return;
+  const wasDisabled=inp.disabled;
+  inp.disabled=true;btn.disabled=true;
+  const msg=document.createElement('div');msg.className='fzmsg';msg.id=`fz${player}`;
+  msg.textContent=`❄️ ${player.toUpperCase()} ถูกหยุดเวลา... ${sec}s`;
+  document.getElementById('ansSec').appendChild(msg);
+  let cnt=sec;
+  const iv=setInterval(()=>{cnt--;if(msg.parentNode)msg.textContent=`❄️ ${player.toUpperCase()} ถูกหยุดเวลา... ${cnt}s`;if(cnt<=0){clearInterval(iv);if(msg.parentNode)msg.parentNode.removeChild(msg);if(G.phase!=='answer')return;if(player==='p1'&&!wasDisabled){inp.disabled=false;btn.disabled=false;inp.focus()}}},1000);
+}
+
+/* ============================================================
+   SUBMIT ANSWER
+============================================================ */
+function submitAns(p,remoteVal){
+  if(p!==1)return; // only "me" (p1) submits from this device; p2 comes via bot/network
+  if(G.phase!=='answer')return;
+  const inp=document.getElementById('p1Ans');
+  const val=remoteVal!==undefined?remoteVal:parseFloat(inp.value);
+  if(isNaN(val)){inp.focus();return}
+  if(G.p1Ans!==null)return;
+  G.p1Ans=val;G.p1Ms=Date.now()-G.qTime;
+  inp.disabled=true;document.getElementById('p1Btn').disabled=true;
+  if(G.mode==='online'){
+    if(G.online.role==='guest'){sendGuestAction('submitAnswer',{val});return}
+    if(G.p2Ans!==null)evalRound();else hostPushState();
+    return;
+  }
+  if(G.p1Ans!==null&&G.p2Ans!==null)evalRound();
+}
+
+/* ============================================================
+   EVALUATE ROUND
+============================================================ */
+function evalRound(){
+  if(G.botCancel){G.botCancel();G.botCancel=null}
+  G.phase='result';
+  const q=G.curQ;
+  const c1=isCorrect(G.p1Ans,q),c2=isCorrect(G.p2Ans,q);
+  let winner=null;
+  if(c1&&c2)winner=G.p1Ms<=G.p2Ms?'p1':'p2';
+  else if(c1)winner='p1';
+  else if(c2)winner='p2';
+  else winner='draw';
+
+  let extra='';
+  if(winner==='p1'){
+    let dmg=(G.p1Dbl&&!G.p2Shield)?2:1;
+    if(G.p1Dbl&&G.p2Shield){G.p2Shield=false;extra='🪬 P2 โล่ป้องกัน ลดชีวิต×2!';dmg=1}
+    if(dmg===2)extra='💀 การ์ดลดชีวิต×2 ทำงาน!';
+    if(G.p2God&&G.p2HP<=1){dmg=0;G.p2God=false;extra='🛡️ P2 การ์ดกันตาย!'}
+    G.p2HP=Math.max(0,G.p2HP-dmg);if(G.p1Dbl)G.p1Dbl=false;
+  }else if(winner==='p2'){
+    let dmg=(G.p2Dbl&&!G.p1Shield)?2:1;
+    if(G.p2Dbl&&G.p1Shield){G.p1Shield=false;extra='🪬 P1 โล่ป้องกัน ลดชีวิต×2!';dmg=1}
+    if(dmg===2)extra='💀 การ์ดลดชีวิต×2 ทำงาน!';
+    if(G.p1God&&G.p1HP<=1){dmg=0;G.p1God=false;extra='🛡️ P1 การ์ดกันตาย!'}
+    G.p1HP=Math.max(0,G.p1HP-dmg);if(G.p2Dbl)G.p2Dbl=false;
+  }
+
+  if(G.p1Sel!==null)G.p1Cards[G.p1Sel].used=true;
+  if(G.p2Sel!==null)G.p2Cards[G.p2Sel].used=true;
+  G.p1Frz=false;G.p2Frz=false;
+
+  if(G.mode==='online'&&G.online.role==='host'){
+    G.online.lastResult={winner,c1,c2,extra};
+  }
+  showRR(winner,c1,c2,extra);renderHearts();
+  if(G.mode==='online'&&G.online.role==='host')hostPushState();
+}
+
+/* ============================================================
+   NEXT ROUND
+============================================================ */
+function nextRound(){
+  document.getElementById('rrOver').style.display='none';
+  if(G.mode==='online'&&G.online.role==='guest')return; // host paces the match
+  if(G.p1HP<=0||G.p2HP<=0){endGame();return}
+  G.round++;
+  if(G.p1Cards.filter(c=>!c.used).length===0)G.p1Cards=genHand(5);
+  if(G.p2Cards.filter(c=>!c.used).length===0)G.p2Cards=genHand(5);
+  resetRound();G.phase='cardSelect';
+  updateUI();
+  if(G.mode==='online'&&G.online.role==='host')hostPushState();
+  if(G.round===3&&G.abRound===1){G.abRound=2;setTimeout(()=>openAbPick(0),400)}
+}
+
+/* ============================================================
+   END GAME (bot / local host path)
+============================================================ */
+function endGame(){
+  const w1=G.p2HP<=0&&G.p1HP>0,w2=G.p1HP<=0&&G.p2HP>0;
+  if(G.mode==='online'&&G.online.role==='host'){
+    G.phase='over';
+    (async()=>{
+      await sSet('game:'+G.online.sessionId,JSON.stringify(stateSnapshot()),true);
+      finishOnlineGame({p1HP:G.p1HP,p2HP:G.p2HP});
+    })();
+    return;
+  }
+  (async()=>{
+    if(!G.isBot){
+      if(w1)await updateMyStars(1,true);
+      else if(w2)await updateMyStars(-1,false);
+    }
+    updateHomeProfile();
+    document.getElementById('goIco').textContent=w1?'🏆':w2?'💔':'🤝';
+    document.getElementById('goTit').textContent=w1?`${esc(G.myName)} ชนะ! 🎉`:w2?`${esc(G.opName)} ชนะ!`:'เสมอ! 🤝';
+    document.getElementById('goSt').textContent=G.isBot?'🤖 ไม่นับดาว':w1?'⭐ +1 ดาว':w2?'💔 −1 ดาว':'➖ ±0 ดาว';
+    document.getElementById('goDesc').textContent=`เล่นกับ ${esc(G.opName)}`;
+    document.getElementById('goStats').innerHTML=`
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>❤️ ${esc(G.myName)}</span><strong>${G.p1HP} HP</strong></div>
+      <div style="display:flex;justify-content:space-between${G.isBot?'':';margin-bottom:12px'}"><span>❤️ ${esc(G.opName)}</span><strong>${G.p2HP} HP</strong></div>
+      ${!G.isBot?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">ดาวของคุณ: <strong style="color:var(--gold)">⭐ ${(G.myProfile&&G.myProfile.stars)||0}</strong></div>`:''}`;
+    showScreen('screen-gameover');renderLB();
+  })();
+}
+
+/* ============================================================
+   ABILITY PICK FLOW
+============================================================ */
+function openAbPick(pi){
+  G.pendPP=pi;G.abSelIdx=null;
+  if(G.mode==='online'&&pi===1){
+    const owned=G.p2Ab.map(a=>a.id);
+    const avail=ALL_AB.filter(a=>!owned.includes(a.id)).sort(()=>Math.random()-.5).slice(0,3);
+    if(!avail.length){finishAbPick(1);return}
+    G.online.guestAbOptions=avail;G.abPickFor='p2';
+    hostPushState();
+    return; // wait for the guest's pick to arrive via applyGuestAction
+  }
+  const owned=(pi===0?G.p1Ab:G.p2Ab).map(a=>a.id);
+  const avail=ALL_AB.filter(a=>!owned.includes(a.id)).sort(()=>Math.random()-.5).slice(0,3);
+  if(!avail.length){finishAbPick(pi);return}
+  const pn=pi===0?(G.myName||'P1'):(G.opName||'P2');
+  document.getElementById('apSub').textContent=`${esc(pn)}: เลือก 1 ใบจาก 3 ใบ`;
+  const grid=document.getElementById('apGrid');
+  grid._ch=avail;
+  grid.innerHTML=avail.map((a,i)=>`<div class="apc" id="apc${i}" onclick="selAbCard(${i})"><div class="api">${a.icon}</div><div class="apn">${a.name}</div><div class="apd">${a.desc}</div></div>`).join('');
+  const cb=document.getElementById('apConfirm');cb.disabled=true;cb.style.opacity='0.5';
+  document.getElementById('apModal').style.display='flex';
+}
+function selAbCard(i){
+  G.abSelIdx=i;
+  document.querySelectorAll('.apc').forEach((el,j)=>el.classList.toggle('sel',j===i));
+  const cb=document.getElementById('apConfirm');cb.disabled=false;cb.style.opacity='1';
+}
+function confirmAbPick(){
+  if(G.abSelIdx===null)return;
+  const grid=document.getElementById('apGrid');
+  const idx=G.abSelIdx;
+  document.getElementById('apModal').style.display='none';
+  if(G.mode==='online'&&G.online.role==='guest'){
+    sendGuestAction('pickAbility',{idx});
+    G.abSelIdx=null;
+    return;
+  }
+  const card={...grid._ch[idx]};
+  if(G.pendPP===0)G.p1Ab.push(card);else G.p2Ab.push(card);
+  finishAbPick(G.pendPP);
+}
+function finishAbPick(pi){
+  if(pi===0){
+    if(G.isBot){
+      const owned=G.p2Ab.map(a=>a.id);
+      const avail=ALL_AB.filter(a=>!owned.includes(a.id));
+      const pref=['heal','godMode','double','freeze','shield','blur','swap','hint'];
+      for(const id of pref){const f=avail.find(a=>a.id===id);if(f){G.p2Ab.push({...f});break}}
+      if(G.abRound===0)G.abRound=1;
+      updateUI();
+    }else{
+      setTimeout(()=>openAbPick(1),300);
+      if(G.mode==='online'&&G.online.role==='host')hostPushState();
+    }
+  }else{
+    if(G.abRound===0)G.abRound=1;
+    updateUI();
+    if(G.mode==='online'&&G.online.role==='host')hostPushState();
+  }
+}
+
+/* ============================================================
+   USE ABILITY
+============================================================ */
+function useAbility(player,id){
+  if(G.mode==='online'&&G.online.role==='guest'&&player==='p1'){
+    sendGuestAction('useAbility',{id});
+    return;
+  }
+  const um=player==='p1'?G.p1AbUsed:G.p2AbUsed;
+  const ab=player==='p1'?G.p1Ab:G.p2Ab;
+  if(um[id])return;
+  if(!ab.find(a=>a.id===id))return;
+  if(!canUseAb(id,G.phase)){showStatus(`⚠️ ใช้การ์ดนี้ได้เฉพาะตอนตอบคำถาม`,'si');return}
+  const opp=player==='p1'?'p2':'p1';
+  const pn=player==='p1'?(G.myName||'P1'):(G.opName||'P2');
+  const on=opp==='p1'?(G.myName||'P1'):(G.opName||'P2');
+  switch(id){
+    case 'heal':
+      if(player==='p1')G.p1HP=Math.min(9,G.p1HP+1);else G.p2HP=Math.min(9,G.p2HP+1);
+      um[id]=true;showStatus(`❤️ ${esc(pn)} เพิ่ม 1HP!`,'sa');renderHearts();break;
+    case 'godMode':
+      if(player==='p1')G.p1God=true;else G.p2God=true;
+      um[id]=true;showStatus(`🛡️ ${esc(pn)} เปิดการ์ดกันตาย!`,'sa');break;
+    case 'shield':
+      if(player==='p1')G.p1Shield=true;else G.p2Shield=true;
+      um[id]=true;showStatus(`🪬 ${esc(pn)} วางโล่ป้องกัน!`,'sa');break;
+    case 'double':
+      if(player==='p1')G.p1Dbl=true;else G.p2Dbl=true;
+      um[id]=true;showStatus(`💀 ${esc(pn)} เปิดโหมดลดชีวิต×2!`,'sa');break;
+    case 'freeze':
+      if(G.phase!=='answer')return;
+      if(player==='p1')G.p2Frz=true;else G.p1Frz=true;
+      um[id]=true;applyFreezeUI(opp,3);showStatus(`❄️ ${esc(on)} ถูกหยุดเวลา 3 วิ!`,'sa');break;
+    case 'hint':
+      if(G.phase!=='answer')return;
+      um[id]=true;showHint();break;
+    case 'swap':
+      if(G.phase!=='answer')return;
+      if(G.mode==='online'&&player==='p1'){um[id]=true;document.getElementById('swapModal').style.display='flex';renderAbCards();return}
+      const os=opp==='p1'?G.p1Shield:G.p2Shield;
+      if(os){if(opp==='p1')G.p1Shield=false;else G.p2Shield=false;um[id]=true;showStatus(`🪬 ${esc(on)} มีโล่! สลับโจทย์ไม่ได้`,'si');renderAbCards();if(G.mode==='online'&&G.online.role==='host')hostPushState();return}
+      um[id]=true;document.getElementById('swapModal').style.display='flex';break;
+    case 'blur':
+      if(G.phase!=='answer')return;
+      um[id]=true;applyBlur();showStatus(`🌫️ ${esc(pn)} เบลอตัวเลขในโจทย์!`,'sa');break;
+  }
+  renderAbCards();
+  if(G.mode==='online'&&G.online.role==='host'&&id!=='swap')hostPushState();
+}
+function confirmSwap(doIt){
+  document.getElementById('swapModal').style.display='none';
+  if(G.mode==='online'&&G.online.role!=='host'){
+    sendGuestAction('swapDecision',{doIt});
+    return;
+  }
+  if(!doIt){if(G.mode==='online'&&G.online.role==='host')hostPushState();return}
+  const q2=G.p2Cards[G.p2Sel]?.q;
+  if(q2){G.curQ={...q2};document.getElementById('qText').textContent=G.curQ.display;showStatus('🔄 สลับโจทย์แล้ว!','sa')}
+  if(G.mode==='online'&&G.online.role==='host')hostPushState();
+}
+function applyBlur(){
+  const el=document.getElementById('qText');const txt=el.textContent;
+  const nums=txt.match(/\d+/g);if(!nums)return;
+  const t=nums[Math.floor(Math.random()*nums.length)];let done=false;
+  el.innerHTML=txt.replace(/\d+/g,m=>{if(!done&&m===t){done=true;return`<span class="blurn">${m}</span>`}return m});
+}
+function showHint(){
+  const ca=Math.round(G.curQ.ans);const ws=new Set();
+  while(ws.size<3){const o=Math.ceil(Math.random()*Math.max(5,Math.abs(ca)*.4));const c=ca+(Math.random()<.5?o:-o);if(c!==ca)ws.add(Math.round(c))}
+  const ch=[ca,...ws].sort(()=>Math.random()-.5);
+  document.getElementById('chGrid').innerHTML=ch.map(c=>`<button class="chbtn" onclick="pickHint(${c},${ca},this)">${c}</button>`).join('');
+  document.getElementById('mcWrap').style.display='block';
+}
+function pickHint(v,ca,el){
+  document.querySelectorAll('.chbtn').forEach(b=>b.disabled=true);
+  el.classList.add(v===ca?'cor':'wrg');
+  if(v!==ca)document.querySelectorAll('.chbtn').forEach(b=>{if(parseInt(b.textContent)===ca)b.classList.add('cor')});
+  setTimeout(()=>{document.getElementById('p1Ans').value=v;document.getElementById('mcWrap').style.display='none'},900);
+}
+
+/* ============================================================
+   UI RENDER
+============================================================ */
+function updateUI(){
+  document.getElementById('p1Name').textContent=G.myName||'P1';
+  document.getElementById('p2Name').textContent=G.opName||'P2';
+  document.getElementById('p1HL').textContent=G.myName||'P1';
+  document.getElementById('p2HL').textContent=G.opName||'P2';
+  document.getElementById('p1AL').textContent=G.myName||'P1';
+  document.getElementById('p2AL').textContent=G.opName||'P2';
+  document.getElementById('p1AnsLbl').textContent=G.myName||'P1';
+  document.getElementById('p2AnsLbl').textContent=G.opName||'P2';
+  document.getElementById('roundDis').textContent=`รอบที่ ${G.round}`;
+  renderHearts();renderHandCards();renderAbCards();setPhaseBadge();resetQDisplay();
+}
+function renderHearts(){
+  ['p1','p2'].forEach(p=>{
+    const hp=p==='p1'?G.p1HP:G.p2HP;
+    document.getElementById(`${p}Hearts`).innerHTML=Array.from({length:5},(_,i)=>`<span class="heart${i>=hp?' empty':''}">❤️</span>`).join('');
+  });
+}
+function renderHandCards(){
+  ['p1','p2'].forEach(p=>{
+    const cards=p==='p1'?G.p1Cards:G.p2Cards;
+    const sel=p==='p1'?G.p1Sel:G.p2Sel;
+    const el=document.getElementById(`${p}HCards`);
+    const sec=document.getElementById(`${p}HSec`);
+    if(G.phase!=='cardSelect'){sec.style.display='none';return}
+    sec.style.display='';
+    const interactive=p==='p1';
+    el.innerHTML=cards.map((c,i)=>`<div class="hcard${c.used?' used':''}${sel===i?' sel':''}${interactive?'':' static'}" ${interactive?`onclick="selCard('${p}',${i})"`:''}><span style="font-size:26px">🃏</span><div class="cnum">#${i+1}</div></div>`).join('');
+  });
+  checkConf();
+}
+function renderAbCards(){
+  ['p1','p2'].forEach(p=>{
+    const ab=p==='p1'?G.p1Ab:G.p2Ab;
+    const um=p==='p1'?G.p1AbUsed:G.p2AbUsed;
+    const interactive=p==='p1';
+    document.getElementById(`${p}AbCards`).innerHTML=ab.map(a=>`<div class="abcard${um[a.id]?' used':''}${interactive?'':' static'}" ${interactive?`onclick="useAbility('${p}','${a.id}')"`:''} title="${a.desc}"><div class="ai">${a.icon}</div><div class="an">${a.name}</div></div>`).join('');
+  });
+}
+function setPhaseBadge(){
+  const b=document.getElementById('phaseBadge'),d=document.getElementById('phaseDesc');
+  if(G.phase==='cardSelect'){b.textContent='เลือกการ์ดโจทย์';d.textContent='แต่ละฝ่ายเลือก 1 ใบจากมือ (หน้าคว่ำ)';document.getElementById('ansSec').style.display='none';document.getElementById('mcWrap').style.display='none';document.getElementById('botArea').style.display='none'}
+  else if(G.phase==='answer'){b.textContent='ตอบคำถาม!';d.textContent='ใครตอบถูกก่อน — ชนะรอบ!'}
+  else{b.textContent='ผลการแข่ง';d.textContent=''}
+}
+function resetQDisplay(){
+  document.getElementById('qCard').classList.remove('rev');
+  document.getElementById('qText').innerHTML='<span class="qhid">? ? ?</span>';
+  document.getElementById('ansSec').style.display='none';
+  document.getElementById('mcWrap').style.display='none';
+  document.getElementById('botArea').style.display='none';
+  document.getElementById('p1HSec').style.display='';
+  document.getElementById('p2HSec').style.display='';
+}
+function showRR(winner,c1,c2,extra,remoteView){
+  const p1=G.myName||'P1',p2=G.opName||'P2';
+  let icon,title,sub;
+  if(winner==='draw'){icon='🤝';title='เสมอ!';sub='ทั้งสองฝ่ายตอบไม่ถูก'}
+  else if(winner==='p1'){icon='🏅';title=`${esc(p1)} ชนะ!`;sub=`ตอบถูกใน ${((G.p1Ms||0)/1000).toFixed(2)}s`}
+  else{icon=G.isBot?'🤖':'🏅';title=`${esc(p2)} ชนะ!`;sub=`ตอบถูกใน ${((G.p2Ms||0)/1000).toFixed(2)}s`}
+  document.getElementById('rIcon').textContent=icon;
+  document.getElementById('rTitle').textContent=title;
+  document.getElementById('rSub').textContent=sub;
+  document.getElementById('rDet').innerHTML=`${extra?`<div>${extra}</div>`:''}<div style="margin-top:6px;font-size:12px">${esc(p1)}: ${c1?'✅ ถูก':'❌ ผิด'} | ${esc(p2)}: ${c2?'✅ ถูก':'❌ ผิด'}</div><div style="margin-top:4px;font-size:12px;color:var(--text2)">❤️ ${esc(p1)}: ${G.p1HP}HP | ${esc(p2)}: ${G.p2HP}HP</div>`;
+  const isGuestView=G.mode==='online'&&G.online&&G.online.role==='guest';
+  document.getElementById('rrNextBtn').style.display=isGuestView?'none':'block';
+  document.getElementById('rrWaitTxt').style.display=isGuestView?'block':'none';
+  document.getElementById('rrOver').style.display='flex';
+}
+
+let _stTimer=null;
+function showStatus(msg,cls='si'){
+  const el=document.getElementById('statusArea');
+  el.innerHTML=`<div class="smsg ${cls}">${msg}</div>`;
+  clearTimeout(_stTimer);_stTimer=setTimeout(()=>{if(el)el.innerHTML=''},3200);
+}
+async function sendGuestAction(type,payload){
+  if(!G.online)return;
+  G.online.seq=(G.online.seq||0)+1;
+  await sSet('gact:'+G.online.sessionId,JSON.stringify({seq:G.online.seq,type,payload,ts:Date.now()}),true);
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+</script>
+</body>
+</html>
